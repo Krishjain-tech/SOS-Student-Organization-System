@@ -11,7 +11,7 @@ const env = {
   APP_ORIGIN: 'http://127.0.0.1:5191', API_PROXY_TARGET: 'http://127.0.0.1:3107',
 };
 export default defineConfig({
-  testDir: './tests/browser', fullyParallel: false, workers: 1, timeout: 30000,
+  testDir: './tests/browser', fullyParallel: false, workers: 1, timeout: 30000, expect: { timeout: 10000 },
   reporter: [['list']], outputDir: './test-results', globalTeardown: './tests/browser-teardown.ts',
   use: { baseURL: 'http://127.0.0.1:5191', channel: process.env.PLAYWRIGHT_CHANNEL || 'chrome', headless: true, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   webServer: [
