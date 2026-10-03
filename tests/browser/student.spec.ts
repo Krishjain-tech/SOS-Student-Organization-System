@@ -3,8 +3,8 @@ import { test, expect, type Page } from '@playwright/test';
 const password = 'SkylineDemo!2026';
 
 async function loginStudent(page: Page, email = 'student@skyline.example.com', pass = password) {
-  await page.goto('/student/login');
-  await expect(page.getByRole('heading', { name: 'Student sign in' })).toBeVisible();
+  await page.goto('/login');
+  await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
   await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(pass);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
@@ -72,11 +72,11 @@ test('student sign out invalidates session and redirects protected routes', asyn
 
   // Click Sign out button
   await page.getByRole('button', { name: 'Sign out' }).first().click();
-  await expect(page).toHaveURL(/\/student\/login/);
+  await expect(page).toHaveURL(/\/login/);
 
-  // Attempting to visit /student should redirect back to /student/login
+  // Attempting to visit /student should redirect back to /login
   await page.goto('/student');
-  await expect(page).toHaveURL(/\/student\/login/);
+  await expect(page).toHaveURL(/\/login/);
 });
 
 test('student account is blocked from admin and volunteer workspaces', async ({ page }) => {
@@ -97,12 +97,12 @@ test('student account is blocked from admin and volunteer workspaces', async ({ 
 test('wrong student credentials show generic failure message', async ({ page }) => {
   await loginStudent(page, 'student@skyline.example.com', 'WrongPassword123!');
   await expect(page.getByText(/Sign in was unsuccessful/)).toBeVisible();
-  await expect(page).toHaveURL(/\/student\/login$/);
+  await expect(page).toHaveURL(/\/login$/);
 });
 
 test('cross-workspace consistency for shared event images and pricing', async ({ page }) => {
   // 1. Check Admin view
-  await page.goto('/admin/login');
+  await page.goto('/login');
   await page.getByLabel('Email address').fill('admin@skyline.example.com');
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();

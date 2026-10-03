@@ -91,9 +91,13 @@ test('default seed is repeat safe and reconciles every financial source, stock m
 
 test('portal roles, forged fields, CSRF, origins, unauthenticated and admin API boundaries', async () => {
   expectStatus(await anonymous.request('GET', '/admin/dashboard'), 401);
-  const denied = new Client(); expectStatus(await denied.login('krish@skyline.example.com', 'admin'), 401); expectStatus(await denied.login('admin@skyline.example.com', 'volunteer'), 401);
+  const wrongPass = new Client();
+  expectStatus(await wrongPass.login('krish@skyline.example.com', 'volunteer', 'WrongPassword!123'), 401);
+  const unknownUser = new Client();
+  expectStatus(await unknownUser.login('unknown@skyline.example.com', 'admin', DEMO_PASSWORD), 401);
+  const denied = new Client(); await denied.token();
   expectStatus(await denied.request('POST', '/auth/login', { email: 'krish@skyline.example.com', password: DEMO_PASSWORD, requestedPortal: 'superadmin' }), 422);
-  expectStatus(await denied.request('POST', '/auth/login', { email: 'krish@skyline.example.com', password: DEMO_PASSWORD, requestedPortal: 'volunteer', roles: ['admin'] }), 422);
+  expectStatus(await denied.request('POST', '/auth/login', { email: 'krish@skyline.example.com', password: DEMO_PASSWORD, roles: ['admin'] }), 422);
   expectStatus(await krish.request('GET', '/admin/dashboard'), 403); expectStatus(await admin.request('GET', '/volunteer/dashboard'), 403);
   for (const route of ['/members', '/users', '/products', '/finance/summary', '/finance/export.csv', '/mock-outbox']) expectStatus(await krish.request('GET', route), 403);
   expectStatus(await krish.request('PATCH', `/users/${SEED_IDS.krish}`, { roles: ['admin'] }), 403);

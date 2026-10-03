@@ -7,7 +7,7 @@ export const claimStatuses = ['DRAFT','SUBMITTED','CHANGES_REQUESTED','REJECTED'
 export const loginSchema = z.object({
   email: z.string().email().max(254).transform(v => v.toLowerCase().trim()),
   password: z.string().min(1).max(200),
-  requestedPortal: z.enum(roles)
+  requestedPortal: z.enum(roles).optional()
 }).strict();
 
 export const passwordSchema = z.string().min(12, 'Use at least 12 characters').max(200);
@@ -111,4 +111,5 @@ export type User = {
   active: number;
   email_verified_at?: string | null;
   roles: Array<typeof roles[number]>;
+  workspaces?: Array<typeof roles[number]>;
 };

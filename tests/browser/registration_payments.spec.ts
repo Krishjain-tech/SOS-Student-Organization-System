@@ -25,7 +25,7 @@ test.describe('Student Registration, Email Verification & Payment Flows', () => 
     await expect(page.getByText(studentEmail)).toBeVisible();
 
     // 3. Try signing in BEFORE email verification -> blocked with clear message
-    await page.goto('/student/login');
+    await page.goto('/login');
     await page.getByLabel('Email address').fill(studentEmail);
     await page.getByLabel('Password', { exact: true }).fill(studentPassword);
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
@@ -45,7 +45,7 @@ test.describe('Student Registration, Email Verification & Payment Flows', () => 
 
     // Click link to sign in
     await page.getByRole('link', { name: 'Sign in to Student Workspace' }).click();
-    await expect(page).toHaveURL(/\/student\/login/);
+    await expect(page).toHaveURL(/\/login/);
 
     // 6. Sign in AFTER email verification
     await page.getByLabel('Email address').fill(studentEmail);

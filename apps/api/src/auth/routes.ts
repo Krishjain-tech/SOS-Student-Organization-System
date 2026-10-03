@@ -25,7 +25,7 @@ export function issuePasswordReset(req:any,res:any) {
 export function createAuthRouter(generateToken:(req:any,overwrite?:boolean)=>string) {
   const router=Router();
   router.get('/csrf',(req,res)=>res.json({data:{csrfToken:generateToken(req)}}));
-  router.get('/me',requireAuth,(req,res)=>res.json({data:req.user}));
+  router.get('/me',requireAuth,(req,res)=>res.json({data:{...req.user,workspaces:req.user?.roles}}));
   router.post('/login',asyncRoute(async(req,res)=>{
     const data=validate(loginSchema,req.body), db=getDb(), key=`${req.ip}:${data.email}`;
     const attempt=db.prepare('SELECT * FROM login_attempts WHERE key=?').get(key) as any;
@@ -35,12 +35,12 @@ export function createAuthRouter(generateToken:(req:any,overwrite?:boolean)=>str
     let matches=await argon2.verify(row?.password_hash||await dummyHash,data.password);
     if(!matches&&trimmed!==data.password&&row?.password_hash) matches=await argon2.verify(row.password_hash,trimmed);
     const user=row?userById(row.id):undefined;
-    if(!matches||!user?.active||!user.roles.includes(data.requestedPortal)) {
+    if(!matches||!user?.active||!user.roles.length) {
       const failures=attempt&&(Date.now()-Date.parse(attempt.updated_at)<15*60*1000)?attempt.failures+1:1;
       db.prepare('INSERT INTO login_attempts(key,failures,blocked_until,updated_at) VALUES(?,?,?,?) ON CONFLICT(key) DO UPDATE SET failures=excluded.failures,blocked_until=excluded.blocked_until,updated_at=excluded.updated_at').run(key,failures,failures>=5?new Date(Date.now()+15*60*1000).toISOString():null,now());
-      throw apiError(401,'LOGIN_FAILED','Sign in was unsuccessful. Check your details and workspace.');
+      throw apiError(401,'LOGIN_FAILED','Sign in was unsuccessful. Check your details.');
     }
-    if(data.requestedPortal==='student'&&!row.email_verified_at) {
+    if(user.roles.includes('student')&&!row.email_verified_at) {
       throw apiError(403,'EMAIL_NOT_VERIFIED','Please verify your email address before signing in.');
     }
     db.prepare('DELETE FROM login_attempts WHERE key=?').run(key);
@@ -48,7 +48,8 @@ export function createAuthRouter(generateToken:(req:any,overwrite?:boolean)=>str
     req.session.userId=row.id;req.session.sessionVersion=row.session_version;req.session.loggedInAt=Date.now();
     const csrfToken=generateToken(req,true);
     await new Promise<void>((resolve,reject)=>req.session.save(err=>err?reject(err):resolve()));
-    audit(row.id,'LOGIN','user',row.id,{portal:data.requestedPortal});res.json({data:{...user,csrfToken}});
+    audit(row.id,'LOGIN','user',row.id,{roles:user.roles});
+    res.json({data:{...user,roles:user.roles,workspaces:user.roles,csrfToken}});
   }));
   router.post('/register/student',asyncRoute(async(req,res)=>{
     const data=validate(studentRegistrationSchema,req.body), db=getDb();

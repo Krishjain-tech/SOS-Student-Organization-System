@@ -23,7 +23,8 @@ import {
   ShoppingBag,
   ShieldCheck,
   Tag,
-  Users
+  Users,
+  ArrowLeftRight
 } from 'lucide-react';
 import { api, queryClient, type User } from '../lib/api';
 import { useAuth } from '../App';
@@ -217,10 +218,11 @@ export function StudentPortal() {
     try {
       await api('/auth/logout', 'POST', {});
       queryClient.clear();
+      nav('/login', { replace: true });
       setUser(null);
-      nav('/student/login');
     } catch {
-      nav('/student/login');
+      nav('/login', { replace: true });
+      setUser(null);
     }
   };
 
@@ -569,6 +571,16 @@ export function StudentPortal() {
                       <span>View Membership</span>
                       <Crown className="w-3.5 h-3.5 text-amber-500" />
                     </button>
+                    {user?.roles && user.roles.length > 1 && (
+                      <Link
+                        to="/select-workspace"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center justify-between font-semibold"
+                      >
+                        <span>Switch workspace</span>
+                        <ArrowLeftRight className="w-3.5 h-3.5 text-[#1463D8]" />
+                      </Link>
+                    )}
                     <button
                       onClick={logout}
                       className="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center justify-between font-semibold"

@@ -48,7 +48,7 @@ export function StudentRegister() {
   return (
     <div className="login-page">
       <div className="login-card" style={{ maxWidth: '440px' }}>
-        <Link className="brand" to="/student/login">
+        <Link className="brand" to="/login">
           <WorkspaceLogo />
         </Link>
         <span className="eyebrow">Student workspace</span>
@@ -154,7 +154,7 @@ export function StudentRegister() {
 
         <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '13px' }}>
           <span style={{ color: '#64748b' }}>Already have an account? </span>
-          <Link to="/student/login" style={{ color: '#1463D8', fontWeight: 600, textDecoration: 'none' }}>
+          <Link to="/login" style={{ color: '#1463D8', fontWeight: 600, textDecoration: 'none' }}>
             Sign in
           </Link>
         </div>
@@ -187,7 +187,7 @@ export function StudentCheckEmail() {
   return (
     <div className="login-page">
       <div className="login-card" style={{ maxWidth: '440px', textAlign: 'center' }}>
-        <Link className="brand" to="/student/login">
+        <Link className="brand" to="/login">
           <WorkspaceLogo />
         </Link>
         <div style={{ width: '56px', height: '56px', background: '#eff6ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '16px auto 8px', color: '#1463D8' }}>
@@ -216,7 +216,7 @@ export function StudentCheckEmail() {
           )}
 
           <Link
-            to="/student/login"
+            to="/login"
             style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#1463D8', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px' }}
           >
             <ArrowLeft size={15} /> Back to sign in
@@ -276,7 +276,7 @@ export function StudentVerifyEmail() {
   return (
     <div className="login-page">
       <div className="login-card" style={{ maxWidth: '440px', textAlign: 'center' }}>
-        <Link className="brand" to="/student/login">
+        <Link className="brand" to="/login">
           <WorkspaceLogo />
         </Link>
 
@@ -298,7 +298,7 @@ export function StudentVerifyEmail() {
               Your email address has been verified. You can now sign in to your Student Workspace.
             </p>
             <Link
-              to="/student/login"
+              to="/login"
               style={{ display: 'block', width: '100%', padding: '11px', background: '#1463D8', color: '#ffffff', fontWeight: 700, fontSize: '14px', borderRadius: '8px', textDecoration: 'none', textAlign: 'center', boxSizing: 'border-box' }}
             >
               Sign in to Student Workspace
@@ -347,7 +347,7 @@ export function StudentVerifyEmail() {
             </form>
 
             <div style={{ marginTop: '18px' }}>
-              <Link to="/student/login" style={{ color: '#64748b', fontSize: '13px', textDecoration: 'none' }}>
+              <Link to="/login" style={{ color: '#64748b', fontSize: '13px', textDecoration: 'none' }}>
                 ← Back to sign in
               </Link>
             </div>

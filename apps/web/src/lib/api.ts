@@ -1,6 +1,6 @@
 import { QueryClient, useQuery } from '@tanstack/react-query';
 export type Row = Record<string, any>;
-export type User = {id: string; name: string; email: string; phone?: string; roles: string[]};
+export type User = {id: string; name: string; email: string; phone?: string; roles: string[]; workspaces?: string[]};
 export class ApiError extends Error { code: string; status: number; fields?: Record<string,string|string[]>; constructor(status:number,error:any){ super(error?.message || 'The request could not be completed.'); this.status=status; this.code=error?.code || 'REQUEST_FAILED'; this.fields=error?.fields; } }
 let csrfToken = '';
 export const queryClient = new QueryClient({defaultOptions:{queries:{staleTime:10000,refetchOnWindowFocus:true,retry:(count,error)=>!(error instanceof ApiError && [401,403,404].includes(error.status)) && count<1}}});
