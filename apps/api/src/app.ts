@@ -13,6 +13,7 @@ import { createAuthRouter } from './auth/routes.js';
 import { createCoreRouter } from './routes/core.js';
 import { createOperationsRouter } from './routes/operations.js';
 import { createStudentRouter } from './routes/student.js';
+import { createPaymentsRouter } from './routes/payments.js';
 import { apiError,errorHandler } from './utils.js';
 
 export function createApp() {
@@ -31,10 +32,11 @@ export function createApp() {
   const store=new ConnectSessionKnexStore({knex:sessionDb,tableName:'sessions',createTable:false,cleanupInterval:60000});
   app.locals.close=()=>{store.options.cleanupInterval=0;clearTimeout((store as any).nextDbCleanup);return sessionDb.destroy();};app.locals.sessionStore=store;
   app.use(session({name:'skyline.sid',store,secret,resave:false,saveUninitialized:false,rolling:true,cookie:{httpOnly:true,sameSite:'lax',secure:production,maxAge:30*60*1000,path:'/'}}));
-  app.use(express.json({limit:'100kb'}));
+  app.use(express.json({limit:'100kb',verify:(req:any,_res,buf)=>{req.rawBody=buf;}}));
   app.use(attachUser);
   const {generateToken,csrfSynchronisedProtection}=csrfSync({getTokenFromRequest:req=>req.get('X-CSRF-Token')});
   app.use('/api',(req,_res,next)=>{
+    if(req.path==='/v1/payments/razorpay/webhook') return next();
     if(!['GET','HEAD','OPTIONS'].includes(req.method)) {
       const origin=req.get('Origin'),ownOrigin=`${req.protocol}://${req.get('host')}`;
       const configured=(process.env.APP_ORIGIN||'').split(',').map(s=>s.trim()).filter(Boolean);
@@ -42,11 +44,19 @@ export function createApp() {
       if(!isAllowed) {next(apiError(403,'ORIGIN_FORBIDDEN','This request origin is not allowed.'));return;}
     }
     next();
-  },csrfSynchronisedProtection);
+  },(req,res,next)=>{
+    if(req.path==='/v1/payments/razorpay/webhook') return next();
+    csrfSynchronisedProtection(req,res,next);
+  });
   app.get('/api/v1/health',(_req,res)=>res.json({data:{status:'ok',database:'sqlite',currency:'INR'}}));
   const authLimiter=rateLimit({windowMs:15*60*1000,limit:40,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'LOGIN_THROTTLED',message:'Too many attempts. Please try again later.'}})});
+  const regLimiter=rateLimit({windowMs:15*60*1000,limit:15,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'REGISTRATION_THROTTLED',message:'Too many registration attempts. Please try again later.'}})});
+  const resendLimiter=rateLimit({windowMs:15*60*1000,limit:10,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'RESEND_THROTTLED',message:'Too many resend attempts. Please wait before requesting another verification email.'}})});
   app.use(['/api/v1/auth/login','/api/v1/auth/reset/consume'],authLimiter);
+  app.use('/api/v1/auth/register/student',regLimiter);
+  app.use('/api/v1/auth/resend-verification',resendLimiter);
   app.use('/api/v1/auth',createAuthRouter(generateToken));
+  app.use('/api/v1/payments',createPaymentsRouter());
   app.use('/api/v1',createCoreRouter(),createOperationsRouter(),createStudentRouter());
   app.use('/api',(_req,res)=>res.status(404).json({error:{code:'NOT_FOUND',message:'API route not found.'}}));
   const dist=path.resolve('apps/web/dist');

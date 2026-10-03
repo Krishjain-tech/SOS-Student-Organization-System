@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { api, queryClient, type User } from '../lib/api';
 import { useAuth } from '../App';
+import { startRazorpayPayment } from '../lib/razorpay';
 
 interface PortalData {
   user: User;
@@ -251,17 +252,54 @@ export function StudentPortal() {
   const handleBookTicket = async (eventId: string) => {
     setBookingLoading(true);
     try {
-      const res = await api<any>('/student/tickets/book', 'POST', {
-        event_id: eventId,
-        tier: selectedTicketTier
-      });
-      showToast('Ticket confirmed! Added to My Tickets.');
-      setEventDetailModalId(null);
-      await refetch();
-      // Optionally open the newly booked ticket
-      if (res?.data) {
-        setTicketModalData(res.data);
+      const activeEv = portalData?.events.find(e => e.id === eventId);
+      const isFree = activeEv && (isMember ? activeEv.member_price_paise === 0 : activeEv.nonmember_price_paise === 0);
+
+      if (isFree) {
+        const res = await api<any>('/student/tickets/book', 'POST', {
+          event_id: eventId,
+          tier: selectedTicketTier
+        });
+        showToast('Ticket confirmed! Added to My Tickets.');
+        setEventDetailModalId(null);
+        await refetch();
+        if (res?.data) {
+          setTicketModalData(res.data);
+        }
+        return;
       }
+
+      // Paid ticket: Razorpay Test Mode checkout
+      const orderRes = await api<any>('/payments/razorpay/order', 'POST', {
+        purpose: 'event_ticket',
+        eventId
+      });
+      const orderData = orderRes.data || orderRes;
+
+      await startRazorpayPayment({
+        key_id: orderData.key_id,
+        order_id: orderData.order_id,
+        intent_id: orderData.intent_id,
+        amount_paise: orderData.amount_paise,
+        name: 'Skyline Student Association',
+        description: `${activeEv?.title || 'Event'} Ticket`,
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+          contact: user?.phone
+        },
+        onSuccess: async (verifyRes: any) => {
+          showToast('Payment verified! Ticket confirmed.');
+          setEventDetailModalId(null);
+          await refetch();
+          if (verifyRes?.data?.ticket) {
+            setTicketModalData(verifyRes.data.ticket);
+          }
+        },
+        onError: (errMsg: string) => {
+          showToast(errMsg || 'Ticket payment was not completed.');
+        }
+      });
     } catch (err: any) {
       showToast(err.message || 'Unable to book ticket. Please try again.');
     } finally {
@@ -286,19 +324,43 @@ export function StudentPortal() {
     }
   };
 
-  // Execute cart checkout
+  // Execute cart checkout with Razorpay
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     setCheckoutLoading(true);
     try {
-      await api('/student/orders/checkout', 'POST', {
-        items: cart.map(item => ({ variant_id: item.variant_id, quantity: item.quantity })),
-        method: 'upi'
+      const items = cart.map(item => ({
+        variantId: item.variant_id,
+        quantity: item.quantity
+      }));
+      const orderRes = await api<any>('/payments/razorpay/order', 'POST', {
+        purpose: 'merchandise',
+        items
       });
-      setCart([]);
-      showToast('Order confirmed! Receipt recorded.');
-      setMyOrdersModalOpen(false);
-      await refetch();
+      const orderData = orderRes.data || orderRes;
+
+      await startRazorpayPayment({
+        key_id: orderData.key_id,
+        order_id: orderData.order_id,
+        intent_id: orderData.intent_id,
+        amount_paise: orderData.amount_paise,
+        name: 'Skyline Student Association',
+        description: 'Campus Merchandise Order',
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+          contact: user?.phone
+        },
+        onSuccess: async () => {
+          setCart([]);
+          showToast('Order confirmed! Receipt recorded.');
+          setMyOrdersModalOpen(false);
+          await refetch();
+        },
+        onError: (errMsg: string) => {
+          showToast(errMsg || 'Merchandise checkout was unsuccessful.');
+        }
+      });
     } catch (err: any) {
       showToast(err.message || 'Checkout was unsuccessful. Please check available stock.');
     } finally {
@@ -306,14 +368,36 @@ export function StudentPortal() {
     }
   };
 
-  // Purchase/renew membership
+  // Purchase/renew membership with Razorpay
   const handleJoinMembership = async () => {
     setBookingLoading(true);
     try {
-      await api('/student/membership/join', 'POST', { plan: 'annual', method: 'upi' });
-      setMembershipStep('success');
-      showToast('Membership activated! Welcome to Skyline Association.');
-      await refetch();
+      const orderRes = await api<any>('/payments/razorpay/order', 'POST', {
+        purpose: 'membership'
+      });
+      const orderData = orderRes.data || orderRes;
+
+      await startRazorpayPayment({
+        key_id: orderData.key_id,
+        order_id: orderData.order_id,
+        intent_id: orderData.intent_id,
+        amount_paise: orderData.amount_paise,
+        name: 'Skyline Student Association',
+        description: 'Annual Student Membership',
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+          contact: user?.phone
+        },
+        onSuccess: async () => {
+          setMembershipStep('success');
+          showToast('Membership activated! Welcome to Skyline Association.');
+          await refetch();
+        },
+        onError: (errMsg: string) => {
+          showToast(errMsg || 'Membership activation unsuccessful.');
+        }
+      });
     } catch (err: any) {
       showToast(err.message || 'Membership activation unsuccessful.');
     } finally {

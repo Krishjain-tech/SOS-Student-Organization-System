@@ -11,12 +11,40 @@ export function assertEditableClaim(claim: any) {
   if (!['DRAFT', 'CHANGES_REQUESTED'].includes(claim.status)) throw apiError(409, 'CLAIM_IMMUTABLE', 'Only drafts and claims requiring corrections may be edited.');
 }
 
-export function postPayment(actor: string, sourceType: string, sourceId: string, amount: number, method: string, reference: string, category: string, description: string, direction: 'IN' | 'OUT', eventId: string | null = null, occurredAt = now(), claimId: string | null = null) {
+export function postPayment(
+  actor: string,
+  sourceType: string,
+  sourceId: string,
+  amount: number,
+  method: string,
+  reference: string,
+  category: string,
+  description: string,
+  direction: 'IN' | 'OUT',
+  eventId: string | null = null,
+  occurredAt = now(),
+  claimId: string | null = null,
+  extra?: { provider?: string; provider_order_id?: string | null; provider_payment_id?: string | null; provider_status?: string | null }
+) {
   const db = getDb();
   if (!Number.isSafeInteger(amount) || amount < 0) throw apiError(422, 'INVALID_MONEY', 'Amounts must be integer paise.');
   const paymentId = id();
-  db.prepare('INSERT INTO payments(id,source_type,source_id,amount_paise,method,reference,settlement_kind,actor_id,created_at) VALUES(?,?,?,?,?,?,?,?,?)')
-    .run(paymentId, sourceType, sourceId, amount, method, reference, settlementKind(), actor, occurredAt);
+  db.prepare('INSERT INTO payments(id,source_type,source_id,amount_paise,method,reference,settlement_kind,actor_id,created_at,provider,provider_order_id,provider_payment_id,provider_status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)')
+    .run(
+      paymentId,
+      sourceType,
+      sourceId,
+      amount,
+      method,
+      reference,
+      settlementKind(),
+      actor,
+      occurredAt,
+      extra?.provider || 'manual',
+      extra?.provider_order_id || null,
+      extra?.provider_payment_id || null,
+      extra?.provider_status || 'captured'
+    );
   if (amount > 0) db.prepare('INSERT INTO ledger_entries(id,direction,amount_paise,category,description,event_id,payment_id,claim_id,actor_id,occurred_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
     .run(id(), direction, amount, category, description, eventId, paymentId, claimId, actor, occurredAt, now());
   return paymentId;
