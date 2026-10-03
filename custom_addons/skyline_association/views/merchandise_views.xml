@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_skyline_merch_tree" model="ir.ui.view">
+        <field name="name">skyline.merch.tree</field>
+        <field name="model">skyline.merch</field>
+        <field name="arch" type="xml">
+            <tree string="Merchandise Products" decoration-danger="stock_qty &lt;= 0">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="price"/>
+                <field name="stock_qty"/>
+                <field name="is_available" widget="boolean_toggle"/>
+                <field name="has_sizes"/>
+                <field name="size_options"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_skyline_merch_form" model="ir.ui.view">
+        <field name="name">skyline.merch.form</field>
+        <field name="model">skyline.merch</field>
+        <field name="arch" type="xml">
+            <form string="Official Merchandise">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Product Title"/>
+                        <h1><field name="name" placeholder="e.g. Skyline Hoodie"/></h1>
+                    </div>
+                    <group>
+                        <group string="Pricing &amp; Inventory">
+                            <field name="price"/>
+                            <field name="stock_qty"/>
+                            <field name="is_available" readonly="1"/>
+                            <field name="category"/>
+                        </group>
+                        <group string="Variants &amp; Media">
+                            <field name="has_sizes"/>
+                            <field name="size_options" invisible="not has_sizes"/>
+                            <field name="default_size"/>
+                            <field name="image_url"/>
+                            <field name="thumbnail_url"/>
+                        </group>
+                    </group>
+                    <group string="Product Description">
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_skyline_merch" model="ir.actions.act_window">
+        <field name="name">Merchandise Catalog</field>
+        <field name="res_model">skyline.merch</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

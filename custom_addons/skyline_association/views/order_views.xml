@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_skyline_order_tree" model="ir.ui.view">
+        <field name="name">skyline.order.tree</field>
+        <field name="model">skyline.order</field>
+        <field name="arch" type="xml">
+            <tree string="Merchandise Orders" decoration-success="status == 'delivered'" decoration-info="status == 'confirmed'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_order"/>
+                <field name="primary_product_name"/>
+                <field name="primary_variant"/>
+                <field name="primary_quantity"/>
+                <field name="amount_total"/>
+                <field name="status" widget="badge" decoration-success="status == 'delivered'" decoration-info="status == 'processing'"/>
+                <field name="payment_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_skyline_order_form" model="ir.ui.view">
+        <field name="name">skyline.order.form</field>
+        <field name="model">skyline.order</field>
+        <field name="arch" type="xml">
+            <form string="Merchandise Order">
+                <header>
+                    <button name="action_mark_confirmed" string="Confirm Order" type="object" class="oe_highlight" invisible="status not in ('processing', 'cart')"/>
+                    <button name="action_mark_delivered" string="Mark Delivered" type="object" class="oe_highlight" invisible="status != 'confirmed'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="cart,processing,confirmed,delivered"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Order Number"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="date_order"/>
+                        </group>
+                        <group>
+                            <field name="payment_status"/>
+                            <field name="amount_total" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Ordered Items">
+                            <field name="line_ids">
+                                <tree string="Items" editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="variant"/>
+                                    <field name="quantity"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_skyline_order" model="ir.actions.act_window">
+        <field name="name">Student Orders</field>
+        <field name="res_model">skyline.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

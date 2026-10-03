@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_skyline_announcement_tree" model="ir.ui.view">
+        <field name="name">skyline.announcement.tree</field>
+        <field name="model">skyline.announcement</field>
+        <field name="arch" type="xml">
+            <tree string="Announcements">
+                <field name="sequence" widget="handle"/>
+                <field name="title"/>
+                <field name="date_display"/>
+                <field name="icon"/>
+                <field name="color" widget="badge"/>
+                <field name="is_published" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_skyline_announcement_form" model="ir.ui.view">
+        <field name="name">skyline.announcement.form</field>
+        <field name="model">skyline.announcement</field>
+        <field name="arch" type="xml">
+            <form string="Official Announcement">
+                <header>
+                    <button name="action_publish" string="Publish on Portal" type="object" class="oe_highlight" invisible="is_published"/>
+                    <button name="action_unpublish" string="Unpublish" type="object" invisible="not is_published"/>
+                    <field name="is_published" widget="boolean_toggle"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title" string="Headline"/>
+                        <h1><field name="title" placeholder="e.g. Spring Gala Tickets Now Live"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="date_display"/>
+                        </group>
+                        <group>
+                            <field name="icon" placeholder="bullhorn, calendar-days, users, bag-shopping"/>
+                            <field name="color"/>
+                        </group>
+                    </group>
+                    <group string="Announcement Content">
+                        <field name="description" placeholder="Summary message visible in the student dashboard..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_skyline_announcement" model="ir.actions.act_window">
+        <field name="name">Announcements</field>
+        <field name="res_model">skyline.announcement</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

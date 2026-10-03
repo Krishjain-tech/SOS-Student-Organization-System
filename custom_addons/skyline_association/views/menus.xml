@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_skyline_root" name="Skyline Association" sequence="10" web_icon="skyline_association,static/src/img/logo.png"/>
+
+    <!-- Members Menu -->
+    <menuitem id="menu_skyline_members" name="Members &amp; Plans" parent="menu_skyline_root" sequence="10"/>
+    <menuitem id="menu_skyline_students_sub" name="Students / Members" parent="menu_skyline_members" action="action_skyline_students" sequence="1"/>
+    <menuitem id="menu_skyline_membership_sub" name="Membership Subscriptions" parent="menu_skyline_members" action="action_skyline_membership" sequence="2"/>
+
+    <!-- Events & Ticketing Menu -->
+    <menuitem id="menu_skyline_events" name="Events &amp; Ticketing" parent="menu_skyline_root" sequence="20"/>
+    <menuitem id="menu_skyline_event_sub" name="Upcoming Events" parent="menu_skyline_events" action="action_skyline_event" sequence="1"/>
+    <menuitem id="menu_skyline_ticket_sub" name="Ticket Attendance &amp; Check-In" parent="menu_skyline_events" action="action_skyline_ticket" sequence="2"/>
+
+    <!-- Merchandise & Orders Menu -->
+    <menuitem id="menu_skyline_merch_root" name="Merchandise &amp; Shop" parent="menu_skyline_root" sequence="30"/>
+    <menuitem id="menu_skyline_merch_sub" name="Merchandise Catalog" parent="menu_skyline_merch_root" action="action_skyline_merch" sequence="1"/>
+    <menuitem id="menu_skyline_order_sub" name="Merchandise Orders" parent="menu_skyline_merch_root" action="action_skyline_order" sequence="2"/>
+
+    <!-- Community & Operations -->
+    <menuitem id="menu_skyline_community" name="Community &amp; Operations" parent="menu_skyline_root" sequence="40"/>
+    <menuitem id="menu_skyline_announcement_sub" name="Announcements" parent="menu_skyline_community" action="action_skyline_announcement" sequence="1"/>
+    <menuitem id="menu_skyline_volunteer_sub" name="Volunteer Tasks &amp; Expenses" parent="menu_skyline_community" action="action_skyline_volunteer" sequence="2"/>
+    <menuitem id="menu_skyline_fundraiser_sub" name="Fundraisers &amp; Financials" parent="menu_skyline_community" action="action_skyline_fundraiser" sequence="3"/>
+</odoo>

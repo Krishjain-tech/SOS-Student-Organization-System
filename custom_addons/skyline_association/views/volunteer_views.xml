@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Volunteer Tasks -->
+    <record id="view_skyline_volunteer_tree" model="ir.ui.view">
+        <field name="name">skyline.volunteer.task.tree</field>
+        <field name="model">skyline.volunteer.task</field>
+        <field name="arch" type="xml">
+            <tree string="Volunteer Tasks" decoration-success="status == 'completed'">
+                <field name="name"/>
+                <field name="event_id"/>
+                <field name="assigned_partner_id"/>
+                <field name="date"/>
+                <field name="hours_logged"/>
+                <field name="expense_amount"/>
+                <field name="expense_reimbursed" widget="boolean_toggle"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_skyline_volunteer_form" model="ir.ui.view">
+        <field name="name">skyline.volunteer.task.form</field>
+        <field name="model">skyline.volunteer.task</field>
+        <field name="arch" type="xml">
+            <form string="Volunteer Opportunity">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="open,assigned,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Task Title"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="event_id"/>
+                            <field name="assigned_partner_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="hours_logged"/>
+                            <field name="expense_amount"/>
+                            <field name="expense_reimbursed"/>
+                        </group>
+                    </group>
+                    <group string="Notes &amp; Instructions">
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_skyline_volunteer" model="ir.actions.act_window">
+        <field name="name">Volunteer Tasks &amp; Expenses</field>
+        <field name="res_model">skyline.volunteer.task</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Fundraisers -->
+    <record id="view_skyline_fundraiser_tree" model="ir.ui.view">
+        <field name="name">skyline.fundraiser.tree</field>
+        <field name="model">skyline.fundraiser</field>
+        <field name="arch" type="xml">
+            <tree string="Fundraising Campaigns" decoration-success="status == 'completed'">
+                <field name="name"/>
+                <field name="goal_amount"/>
+                <field name="raised_amount"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_skyline_fundraiser_form" model="ir.ui.view">
+        <field name="name">skyline.fundraiser.form</field>
+        <field name="model">skyline.fundraiser</field>
+        <field name="arch" type="xml">
+            <form string="Fundraising Campaign">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,active,completed,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Campaign Name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="goal_amount"/>
+                            <field name="raised_amount"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <group string="Campaign Description">
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_skyline_fundraiser" model="ir.actions.act_window">
+        <field name="name">Fundraisers &amp; Financials</field>
+        <field name="res_model">skyline.fundraiser</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

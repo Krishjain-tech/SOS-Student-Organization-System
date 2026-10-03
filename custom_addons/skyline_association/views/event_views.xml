@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_skyline_event_tree" model="ir.ui.view">
+        <field name="name">skyline.event.tree</field>
+        <field name="model">skyline.event</field>
+        <field name="arch" type="xml">
+            <tree string="Events" decoration-info="status == 'upcoming'" decoration-warning="is_sold_out">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="date_display"/>
+                <field name="time_display"/>
+                <field name="location"/>
+                <field name="member_price"/>
+                <field name="non_member_price"/>
+                <field name="capacity"/>
+                <field name="tickets_sold"/>
+                <field name="remaining_seats"/>
+                <field name="is_sold_out" widget="boolean_toggle"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_skyline_event_form" model="ir.ui.view">
+        <field name="name">skyline.event.form</field>
+        <field name="model">skyline.event</field>
+        <field name="arch" type="xml">
+            <form string="Association Event">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="upcoming,ongoing,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Event Name"/>
+                        <h1><field name="name" placeholder="e.g. Spring Gala"/></h1>
+                    </div>
+                    <group>
+                        <group string="Schedule &amp; Location">
+                            <field name="tag" placeholder="e.g. Featured, Prizes"/>
+                            <field name="date_display"/>
+                            <field name="month_short"/>
+                            <field name="day_num"/>
+                            <field name="time_display"/>
+                            <field name="location"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                        <group string="Capacity &amp; Pricing">
+                            <field name="is_free"/>
+                            <field name="member_price" invisible="is_free"/>
+                            <field name="non_member_price" invisible="is_free"/>
+                            <field name="capacity"/>
+                            <field name="tickets_sold" readonly="1"/>
+                            <field name="remaining_seats" readonly="1"/>
+                            <field name="is_sold_out" readonly="1"/>
+                            <field name="image_url"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Description of the event..."/>
+                        </page>
+                        <page string="Attendees &amp; Tickets">
+                            <field name="ticket_ids">
+                                <tree string="Tickets" decoration-success="status == 'checked_in'" decoration-muted="status == 'cancelled'">
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                    <field name="price_paid"/>
+                                    <field name="is_member_rate"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="checkin_time"/>
+                                    <button name="action_checkin" string="Check In" type="object" icon="fa-check text-success" invisible="status == 'checked_in'"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_skyline_event" model="ir.actions.act_window">
+        <field name="name">Upcoming Events</field>
+        <field name="res_model">skyline.event</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

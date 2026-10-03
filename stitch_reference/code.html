@@ -1,0 +1,942 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Skyline Student Association</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet">
+<!-- FontAwesome Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#1463D8',
+              600: '#1052B5',
+              700: '#0c3c84',
+              navy: '#102A4C',
+              dark: '#0B1E36',
+              border: '#DCE6F2',
+              bg: '#F7FAFE'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+<style data-purpose="custom-scrollbars">
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Smooth transition for collapsible sidebar and main column */
+    #main-content-col {
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), flex 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #sidebar-col {
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar-collapsed #sidebar-col {
+      width: 0 !important;
+      min-width: 0 !important;
+      opacity: 0 !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+      margin-left: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      transform: translateX(20px);
+    }
+    .sidebar-collapsed #main-content-col {
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 1 1 100% !important;
+    }
+  </style>
+</head>
+<body class="bg-[#F7FAFE] text-slate-700 antialiased font-sans min-h-screen">
+<!-- BEGIN: MainHeader -->
+<header class="sticky top-0 z-50 bg-white border-b border-[#DCE6F2] shadow-sm">
+<div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between gap-6">
+<!-- Brand Logo -->
+<div class="flex items-center gap-3 shrink-0 cursor-pointer"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhF1jFLw8QiUGzNWuAuYyNI5CrK0wlVeNNP26u_J0Njz12e8A81k1OCRAHuVIVGnYuf2FxIW9huAK-3fuN4kUyqbrzPO05rOeaoMHje7utv0O5x7z5DbLuTT4HHAdp57_FZpQ18po8Ql3Oq5mYj4U0NDtMnP7seBFOwwb3p8WcDuqc1g6q1d1uDvd9wLPmMGVjRsqjIFHwGh9Bs7jtC0BZBpb3FjB0ypFqyGQ9_ZYhCPmjPrmqOvkn_Zs3RBtLAcfqCEw" alt="Skyline" class="w-auto object-contain h-14"><div class="leading-none hidden sm:block border-l border-[#DCE6F2] pl-3"><span class="block text-[11px] font-semibold text-slate-400 tracking-wider uppercase">Student Association</span></div></div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center space-x-7 font-medium text-sm text-slate-600">
+<a class="relative py-5 text-[#1463D8] font-semibold after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#1463D8]" href="#">Home</a>
+<a class="py-5 hover:text-[#1463D8] transition-colors" href="#">Events</a>
+<a class="py-5 hover:text-[#1463D8] transition-colors" href="#">Merchandise</a>
+<a class="py-5 hover:text-[#1463D8] transition-colors" href="#">Announcements</a>
+<a class="py-5 hover:text-[#1463D8] transition-colors" href="#">About</a>
+</nav>
+<!-- Search & Profile Controls -->
+<div class="flex items-center gap-4 shrink-0">
+<!-- Search Field -->
+<div class="relative hidden sm:block w-72">
+<input class="w-full pl-9 pr-4 py-1.5 text-xs bg-slate-50 border border-[#DCE6F2] rounded-full focus:outline-none focus:ring-2 focus:ring-[#1463D8]/30 focus:border-[#1463D8] transition placeholder:text-slate-400 text-slate-700" placeholder="Search events, merchandise..." type="text">
+<i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+</div>
+<!-- Cart Button -->
+<button aria-label="Shopping Cart" class="relative p-2 text-slate-600 hover:text-[#1463D8] hover:bg-slate-50 rounded-full transition">
+<i class="fa-solid fa-cart-shopping text-base"></i>
+<span class="absolute top-0 right-0 w-4 h-4 bg-[#1463D8] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">2</span>
+</button>
+<!-- User Profile Pill -->
+<div class="flex items-center gap-2 pl-2 border-l border-[#DCE6F2] cursor-pointer group">
+<div class="w-8 h-8 rounded-full bg-[#102A4C] text-white text-xs font-semibold flex items-center justify-center ring-2 ring-transparent group-hover:ring-[#1463D8] transition">
+            AP
+          </div>
+<span class="text-xs font-semibold text-[#102A4C] hidden lg:inline">Aarav Patel</span>
+<i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-hover:text-slate-600 transition"></i>
+</div>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: PageContent -->
+<main class="max-w-[1440px] mx-auto px-6 py-6 space-y-6">
+<!-- BEGIN: HeroBanner -->
+<section class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#EFF6FF] via-[#E2EDFB] to-[#C9E0FC] border border-[#DCE6F2] shadow-sm min-h-[300px] flex items-center">
+<!-- Background Graphic & Decorative Photo Mockup -->
+<div class="absolute right-0 top-0 bottom-0 w-full lg:w-3/5 pointer-events-none overflow-hidden select-none">
+<div class="absolute inset-0 bg-gradient-to-r from-[#EFF6FF] via-[#EFF6FF]/70 to-transparent z-10"></div>
+<img alt="Students walking on university campus" class="w-full h-full object-cover object-center opacity-85 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4UUKP9vizFH6riCCCDL9SMo0JMiJpZ8HP7jbKS0H9JPW3ZrrzdqJ4ZiHC1HdbTl57DKbVhkrK5GYsfqvD20Bu4zqTDSuwSK9TgodEWlFptdXHu8IKakJEFi1ZCtLBnCPOm7UTkjnHxN8fRzkFpWV0gjHgM88-MSMXafHy7rJ-BiD5mQ_3CSUgCOIhRNKBX9kyUwix9kPEF-mZz1ofYTzQMJ7Yl4FVDkBsskOG3IKxTCmeKcku2WgsjQ">
+<!-- Skyline Banner Graphic Overlay -->
+<div class="absolute right-12 top-6 bottom-6 w-28 bg-[#1052B5] hidden sm:flex flex-col items-center justify-between p-3 rounded-lg text-white shadow-xl z-20">
+<div class="text-center"><div class="bg-white rounded p-1 shadow-sm mb-1.5"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCMrjNo_6l9HsbRYNeufGlr1fgQpyxJta8S_5q51HrXZVT5mjqwkqcFTXE8MdamRK9Z368HB1xej3xQnyfe6jKKPX6hG-c9z1tMx_iLtYz_03JiKMbcCq_7dH2cVGAIuMn_MCuj8WMY1VxwKIykJSd5uYVmyUqgVYAXzByIYkQFnh766yD3hPemgMG8HwtNXdGShPObGyC3iucYzR-IfY_v4NbUXZSNUUf42WwLEuJCcUarj1NtIXL_5lcoi75ZBHjDu0" alt="Skyline Logo" class="w-full h-auto object-contain"></div><span class="block text-[8px] opacity-80 uppercase tracking-widest">Association</span></div>
+<div class="text-[9px] font-bold text-center tracking-widest uppercase opacity-90 leading-tight"><div class="bg-white rounded p-1 shadow-sm mb-1.5"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCMrjNo_6l9HsbRYNeufGlr1fgQpyxJta8S_5q51HrXZVT5mjqwkqcFTXE8MdamRK9Z368HB1xej3xQnyfe6jKKPX6hG-c9z1tMx_iLtYz_03JiKMbcCq_7dH2cVGAIuMn_MCuj8WMY1VxwKIykJSd5uYVmyUqgVYAXzByIYkQFnh766yD3hPemgMG8HwtNXdGShPObGyC3iucYzR-IfY_v4NbUXZSNUUf42WwLEuJCcUarj1NtIXL_5lcoi75ZBHjDu0" alt="Skyline Logo" class="w-full h-auto object-contain"></div><span class="block text-[8px] opacity-80 uppercase tracking-widest">Association</span></div>
+<i class="fa-solid fa-shield-halved text-sm opacity-60"></i>
+</div>
+</div>
+<!-- Hero Details Content -->
+<div class="relative z-20 max-w-xl p-8 sm:p-10 lg:py-12">
+<span class="inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#1463D8] mb-2">Skyline Student Association</span>
+<h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#102A4C] tracking-tight leading-[1.15] mb-4">
+          Students. Events. <span class="text-[#1463D8]">Community.</span>
+</h1>
+<p class="text-sm sm:text-base text-slate-600 mb-6 leading-relaxed">
+          Join a vibrant community, attend exciting events, grab exclusive merchandise, and be part of something bigger.
+        </p>
+<div class="flex flex-wrap items-center gap-3">
+<a class="px-5 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-lg shadow-md shadow-blue-500/20 inline-flex items-center gap-2 transition transform active:scale-95" href="#">
+            Explore Events <i class="fa-solid fa-arrow-right text-xs"></i>
+</a>
+<a class="px-5 py-2.5 bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8] text-xs font-semibold rounded-lg shadow-sm transition" href="#">
+            View Membership
+          </a>
+</div>
+</div>
+</section>
+<!-- END: HeroBanner -->
+<!-- BEGIN: MembershipHighlight -->
+<section class="rounded-xl border border-[#DCE6F2] bg-gradient-to-r from-[#F0F6FD] via-[#F4F8FE] to-[#EEF5FE] p-4 lg:p-5 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4">
+<!-- Membership Promo Left -->
+<div class="w-full lg:w-1/3 pr-2">
+<h2 class="text-base font-bold text-[#102A4C]">Your Membership</h2>
+<p class="text-xs text-slate-500 mt-0.5 mb-3">Unlock exclusive benefits and be a part of Skyline.</p>
+<button class="px-4 py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-medium rounded-md shadow-sm transition">
+          View Details
+        </button>
+</div>
+<!-- Quick Metrics Right -->
+<div class="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+<!-- Card 1 -->
+<div class="bg-white border border-[#DCE6F2] rounded-lg p-3 flex items-center gap-3 shadow-xs">
+<div class="w-10 h-10 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-base">
+<i class="fa-solid fa-crown"></i>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-[#102A4C]">Active Member</span>
+<span class="bg-emerald-100 text-emerald-700 text-[10px] font-semibold px-1.5 py-0.2 rounded">Active</span>
+</div>
+<p class="text-[11px] text-slate-400 mt-0.5">Valid till 31 Dec 2025</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white border border-[#DCE6F2] rounded-lg p-3 flex items-center gap-3 shadow-xs">
+<div class="w-10 h-10 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-base">
+<i class="fa-solid fa-percent"></i>
+</div>
+<div>
+<span class="text-xs text-slate-400 block font-medium">Member Benefits</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="text-sm font-bold text-[#102A4C]">20%</span>
+<span class="text-[11px] text-slate-500">Discount on events &amp; merch</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white border border-[#DCE6F2] rounded-lg p-3 flex items-center gap-3 shadow-xs">
+<div class="w-10 h-10 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-base">
+<i class="fa-solid fa-ticket"></i>
+</div>
+<div>
+<span class="text-xs text-slate-400 block font-medium">My Registrations</span>
+<div class="flex items-baseline gap-2 mt-0.5">
+<span class="text-sm font-bold text-[#102A4C]">3</span>
+<span class="text-[11px] text-slate-500">1 in delivery</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: MembershipHighlight -->
+<!-- DASHBOARD CONTROLS BAR: Collapse/Expand Sidebar Toggle -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2">
+<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Dashboard View</span>
+<span class="bg-blue-50 text-[#1463D8] border border-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-full" id="view-state-badge">Split View (75/25)</span>
+</div>
+<button class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-700 rounded-lg shadow-2xs transition group" id="sidebarToggleBtn" title="Toggle personal sidebar visibility">
+<i class="fa-solid fa-table-columns text-slate-400 group-hover:text-[#1463D8] transition-transform" id="toggleIcon"></i>
+<span id="toggleText" class="">Collapse Sidebar</span>
+<span class="bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-[#1463D8] text-[10px] px-1.5 py-0.5 rounded font-mono transition">Tab</span>
+</button>
+</div>
+<!-- BEGIN: ContentSplitGrid / Interactive Dashboard Layout -->
+<div class="flex flex-col lg:flex-row gap-6 items-start transition-all duration-300" id="dashboard-container">
+<!-- LEFT / MAIN COLUMN: Upcoming Events & Merchandise (75% default, 100% collapsed) -->
+<div class="w-full lg:w-[75%] shrink-0 space-y-7 transition-all duration-300" id="main-content-col">
+<!-- SECTION: Upcoming Events (Independent Horizontal Scroll Container) -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<h2 class="text-lg font-bold text-[#102A4C] tracking-tight">Upcoming Events</h2>
+<span class="text-xs text-slate-400 hidden sm:inline">• Browse &amp; book tickets</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-1.5">
+<button aria-label="Previous Events" class="w-7 h-7 rounded-full bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-600 flex items-center justify-center transition shadow-2xs" id="eventScrollLeftHeader">
+<i class="fa-solid fa-chevron-left text-[10px]"></i>
+</button>
+<button aria-label="Next Events" class="w-7 h-7 rounded-full bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-600 flex items-center justify-center transition shadow-2xs" id="eventScrollRightHeader">
+<i class="fa-solid fa-chevron-right text-[10px]"></i>
+</button>
+</div>
+<a class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1" href="#">
+    View All Events <i class="fa-solid fa-arrow-right text-[10px]"></i>
+</a>
+</div>
+</div>
+<!-- Carousel Container -->
+<div class="relative group/events">
+<!-- Carousel Nav Left -->
+<button aria-label="Previous Events" class="absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-[#DCE6F2] shadow-md text-slate-600 hover:text-[#1463D8] flex items-center justify-center z-10 transition opacity-90 hover:opacity-100 hover:scale-105" id="eventScrollLeft">
+<i class="fa-solid fa-chevron-left text-xs"></i>
+</button>
+<!-- Event Cards Wrapper (Independent Horizontal Scroll Container) -->
+<div class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5" id="eventsContainer">
+<!-- Event Card 1: Spring Gala -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div>
+<div class="relative h-28 w-full overflow-hidden bg-slate-100">
+<img alt="Spring Gala Concert" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUKZWf4lr93CnVhuYqSlxMGVYY1N1KX6cvvyPDP4aCdQS62weVwKqpJ4b2568nIDXofTLIwvXYw9CJsnak3Jup8nf8tDE_W4pIZ2s3eGofVjH7uBNAazqHUPPvWxQVgIa6UwQEXR2Cld2ZyVCrb04yP_XuZWtlURt4tz1KVqEvriYt9rgjGmPsy6BFpp38Z8PJmEwqpswy3sEUFpt1IzM9WTP81gtf3Ixyu0_8it6RE4q3me9r5Rt-sw">
+<!-- Date Badge -->
+<div class="absolute top-2.5 left-2.5 bg-white/95 rounded-md px-2 py-0.5 text-center shadow-xs">
+<span class="text-[9px] font-bold text-slate-500 uppercase block leading-tight">Nov</span>
+<span class="text-sm font-extrabold text-[#1463D8] leading-none">15</span>
+</div>
+</div>
+<div class="p-3.5 space-y-2">
+<div class="flex items-center gap-2">
+<h3 class="font-bold text-xs text-[#102A4C] truncate">Spring Gala</h3>
+<span class="bg-blue-100 text-[#1463D8] text-[9px] font-bold px-1.5 py-0.5 rounded">Featured</span>
+</div>
+<div class="space-y-1 text-[11px] text-slate-500">
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i>
+<span class="">Main Auditorium</span>
+</div>
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-regular fa-clock text-slate-400 text-[10px]"></i>
+<span class="">6:00 PM - 10:00 PM</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      Our biggest event of the year! Music, food, and unforgettable moments.
+                    </p>
+</div>
+</div>
+<div class="p-3.5 pt-0 mt-auto">
+<div class="flex items-baseline gap-1.5 mb-2.5">
+<span class="text-xs font-bold text-[#102A4C]">₹300</span>
+<span class="text-[10px] text-slate-400">Member</span>
+<span class="text-slate-300">|</span>
+<span class="text-xs font-bold text-slate-500">₹450</span>
+<span class="text-[10px] text-slate-400">Non-member</span>
+</div>
+<button class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-xs transition">
+                    Get Tickets
+                  </button>
+</div>
+</div>
+<!-- Event Card 2: Tech Talk Series -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div>
+<div class="relative h-28 w-full overflow-hidden bg-slate-100">
+<img alt="Tech Talk Presentation" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAluMWZifasg4lbMkZ7MfL_BKDwBf7HrSjKERb1aDeQMBun1v9ABRt5VPbl3qt_mWkXuT-SGyxqssLpNtvAZR-ePwK4LR46RyTz27jWO1ff8t4wtbYnhyn-VcqLhjHCVMK7duQXBQKQ--cg-azP87b2rjRk3qeghnka7qyBat67l-QlOFsiNTfXa9Oe5Nfq0AqrKMbiYeuYrnA1UGCTwgTjdSRcjp-BawMYgI7AHBzMptaIdQsVulFUAQ">
+<!-- Date Badge -->
+<div class="absolute top-2.5 left-2.5 bg-white/95 rounded-md px-2 py-0.5 text-center shadow-xs">
+<span class="text-[9px] font-bold text-slate-500 uppercase block leading-tight">Nov</span>
+<span class="text-sm font-extrabold text-[#1463D8] leading-none">22</span>
+</div>
+</div>
+<div class="p-3.5 space-y-2">
+<h3 class="font-bold text-xs text-[#102A4C] truncate">Tech Talk Series</h3>
+<div class="space-y-1 text-[11px] text-slate-500">
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i>
+<span class="">Block B</span>
+</div>
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-regular fa-clock text-slate-400 text-[10px]"></i>
+<span class="">4:00 PM - 5:30 PM</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      Industry leaders share insights on the future of technology.
+                    </p>
+</div>
+</div>
+<div class="p-3.5 pt-0 mt-auto">
+<div class="flex items-baseline gap-1.5 mb-2.5">
+<span class="text-xs font-bold text-[#102A4C]">₹100</span>
+<span class="text-[10px] text-slate-400">Member</span>
+<span class="text-slate-300">|</span>
+<span class="text-xs font-bold text-slate-500">₹200</span>
+<span class="text-[10px] text-slate-400">Non-member</span>
+</div>
+<button class="w-full py-1.5 bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8] text-xs font-semibold rounded-md shadow-xs transition">
+                    Get Tickets
+                  </button>
+</div>
+</div>
+<!-- Event Card 3: Sports Night -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div>
+<div class="relative h-28 w-full overflow-hidden bg-slate-100">
+<img alt="Soccer match" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1_ZjAHDk3XLspzl4iMuMWL-E1BSKxaXOBeibTDFMrhAFkCTbHLQl_H0nX7LSdhCPWOlhQ6hOhQqY3GBAHM5EtddCHXa8lyuqFtykBvUAX6Im4PKCDouYWo2AylazrY2rMqFTs2bLV0KriQzIs3y3kUK-SSMuDOf_xg6kHvTLqR-G6KzxOfiNysrXmCZDJCEqLN0XUzMqYezUFSQiBCdbOfnPfbDA2y4kvycx3VMh3TeW9U2FDED6ofA">
+<!-- Date Badge -->
+<div class="absolute top-2.5 left-2.5 bg-white/95 rounded-md px-2 py-0.5 text-center shadow-xs">
+<span class="text-[9px] font-bold text-slate-500 uppercase block leading-tight">Dec</span>
+<span class="text-sm font-extrabold text-[#1463D8] leading-none">05</span>
+</div>
+</div>
+<div class="p-3.5 space-y-2">
+<h3 class="font-bold text-xs text-[#102A4C] truncate">Sports Night</h3>
+<div class="space-y-1 text-[11px] text-slate-500">
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i>
+<span class="">University Ground</span>
+</div>
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-regular fa-clock text-slate-400 text-[10px]"></i>
+<span class="">5:00 PM - 8:00 PM</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      An evening of sports, fun and community spirit.
+                    </p>
+</div>
+</div>
+<div class="p-3.5 pt-0 mt-auto">
+<div class="flex items-baseline gap-1.5 mb-2.5">
+<span class="text-xs font-bold text-emerald-600 uppercase">Free</span>
+</div>
+<button class="w-full py-1.5 bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8] text-xs font-semibold rounded-md shadow-xs transition">
+                    Register
+                  </button>
+</div>
+</div>
+<!-- Event Card 4: Cultural Fest -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div>
+<div class="relative h-28 w-full overflow-hidden bg-slate-100">
+<img alt="Cultural Dance Performance" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwXsFXivgE9iI-bNy1xHhAf9tbfu9kBRoIfH1qO2FtsNat0kochmykjalHK85hh6vwtKRa9T7JYUqg5Jl_Lq2R3iOcy7rqPe6wAP8-XAn3__UzWqY-KWosYGgIxX3bR0bFx3q76TrsuK-E5If-ajhar1Rhq-QaUlXyRH_BqpgJPkqTSwZXINyfctT2wlv_kxjZRlqspgZiA_5OQMh-ku4_QTJOD_YfFgvqzp-4VYikHRtEG05z5EgPNQ">
+<!-- Date Badge -->
+<div class="absolute top-2.5 left-2.5 bg-white/95 rounded-md px-2 py-0.5 text-center shadow-xs">
+<span class="text-[9px] font-bold text-slate-500 uppercase block leading-tight">Dec</span>
+<span class="text-sm font-extrabold text-[#1463D8] leading-none">12</span>
+</div>
+</div>
+<div class="p-3.5 space-y-2">
+<h3 class="font-bold text-xs text-[#102A4C] truncate">Cultural Fest</h3>
+<div class="space-y-1 text-[11px] text-slate-500">
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i>
+<span class="">Main Auditorium</span>
+</div>
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-regular fa-clock text-slate-400 text-[10px]"></i>
+<span class="">5:00 PM - 9:00 PM</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      A showcase of talent, creativity and diversity.
+                    </p>
+</div>
+</div>
+<div class="p-3.5 pt-0 mt-auto">
+<div class="flex items-baseline gap-1.5 mb-2.5">
+<span class="text-xs font-bold text-[#102A4C]">₹150</span>
+<span class="text-[10px] text-slate-400">Member</span>
+<span class="text-slate-300">|</span>
+<span class="text-xs font-bold text-slate-500">₹250</span>
+<span class="text-[10px] text-slate-400">Non-member</span>
+</div>
+<button class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-xs transition">
+                    Get Tickets
+                  </button>
+</div>
+</div>
+<!-- Event Card 5: Annual Hackathon (Fills expanded view nicely) -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div>
+<div class="relative h-28 w-full overflow-hidden bg-slate-100">
+<img alt="Coding Hackathon" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAluMWZifasg4lbMkZ7MfL_BKDwBf7HrSjKERb1aDeQMBun1v9ABRt5VPbl3qt_mWkXuT-SGyxqssLpNtvAZR-ePwK4LR46RyTz27jWO1ff8t4wtbYnhyn-VcqLhjHCVMK7duQXBQKQ--cg-azP87b2rjRk3qeghnka7qyBat67l-QlOFsiNTfXa9Oe5Nfq0AqrKMbiYeuYrnA1UGCTwgTjdSRcjp-BawMYgI7AHBzMptaIdQsVulFUAQ">
+<!-- Date Badge -->
+<div class="absolute top-2.5 left-2.5 bg-white/95 rounded-md px-2 py-0.5 text-center shadow-xs">
+<span class="text-[9px] font-bold text-slate-500 uppercase block leading-tight">Dec</span>
+<span class="text-sm font-extrabold text-[#1463D8] leading-none">18</span>
+</div>
+</div>
+<div class="p-3.5 space-y-2">
+<div class="flex items-center gap-2">
+<h3 class="font-bold text-xs text-[#102A4C] truncate">Skyline Hackathon</h3>
+<span class="bg-emerald-100 text-emerald-700 text-[9px] font-bold px-1.5 py-0.5 rounded">Prizes</span>
+</div>
+<div class="space-y-1 text-[11px] text-slate-500">
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i>
+<span class="">Innovation Lab</span>
+</div>
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-regular fa-clock text-slate-400 text-[10px]"></i>
+<span class="">24 Hours Non-stop</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      Team up to build innovative projects with mentorship &amp; awards.
+                    </p>
+</div>
+</div>
+<div class="p-3.5 pt-0 mt-auto">
+<div class="flex items-baseline gap-1.5 mb-2.5">
+<span class="text-xs font-bold text-emerald-600 uppercase">Free Entry</span>
+</div>
+<button class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-xs transition">
+                    Register Team
+                  </button>
+</div>
+</div>
+<!-- Event Card 6: Alumni Mixer (Fills expanded view) -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div>
+<div class="relative h-28 w-full overflow-hidden bg-slate-100">
+<img alt="Alumni Dinner" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUKZWf4lr93CnVhuYqSlxMGVYY1N1KX6cvvyPDP4aCdQS62weVwKqpJ4b2568nIDXofTLIwvXYw9CJsnak3Jup8nf8tDE_W4pIZ2s3eGofVjH7uBNAazqHUPPvWxQVgIa6UwQEXR2Cld2ZyVCrb04yP_XuZWtlURt4tz1KVqEvriYt9rgjGmPsy6BFpp38Z8PJmEwqpswy3sEUFpt1IzM9WTP81gtf3Ixyu0_8it6RE4q3me9r5Rt-sw">
+<!-- Date Badge -->
+<div class="absolute top-2.5 left-2.5 bg-white/95 rounded-md px-2 py-0.5 text-center shadow-xs">
+<span class="text-[9px] font-bold text-slate-500 uppercase block leading-tight">Jan</span>
+<span class="text-sm font-extrabold text-[#1463D8] leading-none">08</span>
+</div>
+</div>
+<div class="p-3.5 space-y-2">
+<h3 class="font-bold text-xs text-[#102A4C] truncate">Alumni Networking Dinner</h3>
+<div class="space-y-1 text-[11px] text-slate-500">
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i>
+<span class="">Faculty Lounge</span>
+</div>
+<div class="flex items-center gap-1.5 truncate">
+<i class="fa-regular fa-clock text-slate-400 text-[10px]"></i>
+<span class="">7:00 PM - 9:30 PM</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      Connect with graduates working at top global tech and finance firms.
+                    </p>
+</div>
+</div>
+<div class="p-3.5 pt-0 mt-auto">
+<div class="flex items-baseline gap-1.5 mb-2.5">
+<span class="text-xs font-bold text-[#102A4C]">₹200</span>
+<span class="text-[10px] text-slate-400">Member</span>
+<span class="text-slate-300">|</span>
+<span class="text-xs font-bold text-slate-500">₹350</span>
+<span class="text-[10px] text-slate-400">Non-member</span>
+</div>
+<button class="w-full py-1.5 bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8] text-xs font-semibold rounded-md shadow-xs transition">
+                    Get Tickets
+                  </button>
+</div>
+</div>
+</div>
+<!-- Carousel Nav Right -->
+<button aria-label="Next Events" class="absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-[#DCE6F2] shadow-md text-slate-600 hover:text-[#1463D8] flex items-center justify-center z-10 transition opacity-90 hover:opacity-100 hover:scale-105" id="eventScrollRight">
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</button>
+</div>
+</section>
+<!-- SECTION: Featured Merchandise (Independent Horizontal Scroll Container) -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<h2 class="text-lg font-bold text-[#102A4C] tracking-tight">Featured Merchandise</h2>
+<span class="text-xs text-slate-400 hidden sm:inline">• Official campus collection</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-1.5">
+<button aria-label="Previous Merchandise" class="w-7 h-7 rounded-full bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-600 flex items-center justify-center transition shadow-2xs" id="merchScrollLeftHeader">
+<i class="fa-solid fa-chevron-left text-[10px]"></i>
+</button>
+<button aria-label="Next Merchandise" class="w-7 h-7 rounded-full bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-600 flex items-center justify-center transition shadow-2xs" id="merchScrollRightHeader">
+<i class="fa-solid fa-chevron-right text-[10px]"></i>
+</button>
+</div>
+<a class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1" href="#">
+    View All Merchandise <i class="fa-solid fa-arrow-right text-[10px]"></i>
+</a>
+</div>
+</div>
+<div class="relative group/merch">
+<!-- Carousel Nav Left -->
+<button aria-label="Previous Merchandise" class="absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-[#DCE6F2] shadow-md text-slate-600 hover:text-[#1463D8] flex items-center justify-center z-10 transition opacity-90 hover:opacity-100 hover:scale-105" id="merchScrollLeft">
+<i class="fa-solid fa-chevron-left text-xs"></i>
+</button>
+<!-- Merch Cards Wrapper (Independent Horizontal Scroll Container) -->
+<div class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5" id="merchContainer">
+<!-- Merch 1: Skyline Hoodie -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div class="p-3">
+<div class="h-36 bg-slate-50 rounded-lg flex items-center justify-center p-2 mb-3">
+<img alt="Navy Skyline Hoodie" class="h-full object-contain mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA7hOVEeaOhhmqC3tlg9KNFBQAjZB_IxpuWCgMhcAXzAfab_ye40mSEZo6RSwQrkOrHS2kZTvfoXQRKRLRqYW_-ZtBel7pVJYXwqCW35t4FY0XVtirmgHacUheu1GysEngY6ub9PuzUeh2wTMo9Xkt7axNo_Pl1Dhae9wsPsrbXl9r1BmM13hvBpVJn3hzxJJv1BMLvlOdh86a4quU5rqc7Qm4IfyxBzLcfb8G0j9ZakgeWZ-UXAG9fw">
+</div>
+<h3 class="font-bold text-xs text-[#102A4C]">Skyline Hoodie</h3>
+<div class="text-sm font-bold text-[#102A4C] mt-0.5">₹800</div>
+</div>
+<div class="p-3 pt-0 space-y-2">
+<select class="w-full text-xs py-1 px-2 rounded-md border border-[#DCE6F2] bg-white text-slate-700 focus:ring-1 focus:ring-[#1463D8] focus:border-[#1463D8]">
+<option>Size: M</option>
+<option>Size: S</option>
+<option>Size: L</option>
+<option>Size: XL</option>
+</select>
+<button class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-xs transition">
+                    Add to Cart
+                  </button>
+</div>
+</div>
+<!-- Merch 2: Skyline T-Shirt -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div class="p-3">
+<div class="h-36 bg-slate-50 rounded-lg flex items-center justify-center p-2 mb-3">
+<img alt="White Skyline T-Shirt" class="h-full object-contain mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLks4Mae-To_-wI4hVg7WjWmk4DUpgtQfWBY6PZHgfHKycC1RDXFHr-BLlfneM8rRMNy7e8C11Il7OvUdgkLC_6gifrNX1jssWmWcJCXss1XXcLwodCpuLx759KUXHi7TEa7fEA7d4ycDqlKgUCqYdjX8xvWmKim2o7n-B1cdUkfu0sKemu9c3bPO3sE5okWESbNfPTwuydWXj4qqp4f3RDhUNLBlReXCuDHgLJ_zJl90QpoRBleveAQ">
+</div>
+<h3 class="font-bold text-xs text-[#102A4C]">Skyline T-Shirt</h3>
+<div class="text-sm font-bold text-[#102A4C] mt-0.5">₹500</div>
+</div>
+<div class="p-3 pt-0 space-y-2">
+<select class="w-full text-xs py-1 px-2 rounded-md border border-[#DCE6F2] bg-white text-slate-700 focus:ring-1 focus:ring-[#1463D8] focus:border-[#1463D8]">
+<option>Size: L</option>
+<option>Size: S</option>
+<option>Size: M</option>
+<option>Size: XL</option>
+</select>
+<button class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-xs transition">
+                    Add to Cart
+                  </button>
+</div>
+</div>
+<!-- Merch 3: Skyline Cap -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div class="p-3">
+<div class="h-36 bg-slate-50 rounded-lg flex items-center justify-center p-2 mb-3">
+<img alt="Skyline Navy Baseball Cap" class="h-full object-contain mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5_JwFD-kCaQcip2FMFMz3Cv0Bx9R3UDn3Uj6Y7lACx5KgrPufpvbh3-Gr6J3PHO2_X1gCHRcvrfc_koOWnLqqNNnth_vTirqw68ZbmeysnDeQ9TT7K4GU1Pg0IyYsI1PWsad4AFONsPHJNVvYLOZXdxdjY8QJ66swb9Iez0cAQXyurvEfSeZ-euLMEv7TzVb-IIdk1nl_tkI-LxVnO3x2SYjiCe4ojKS911mXDL-eBwyy_hSY0d4P-g">
+</div>
+<h3 class="font-bold text-xs text-[#102A4C]">Skyline Cap</h3>
+<div class="text-sm font-bold text-[#102A4C] mt-0.5">₹350</div>
+</div>
+<div class="p-3 pt-0 space-y-2">
+<select class="w-full text-xs py-1 px-2 rounded-md border border-[#DCE6F2] bg-white text-slate-700 focus:ring-1 focus:ring-[#1463D8] focus:border-[#1463D8]">
+<option>One Size</option>
+</select>
+<button class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-xs transition">
+                    Add to Cart
+                  </button>
+</div>
+</div>
+<!-- Merch 4: Skyline Water Bottle -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div class="p-3">
+<div class="h-36 bg-slate-50 rounded-lg flex items-center justify-center p-2 mb-3">
+<img alt="Skyline White Water Bottle" class="h-full object-contain mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCas8KkDjF833uhpW_eGxVKXfij3fE9xO48vDF-amcbl0-oQLUz0r49Jlna99IaqhZygOi9fkJlqieMNdIXNJwvFBAgLLbyHtgDgTPItd-c_M_UHvVpTfkaSxQyXTCKX3b1bpbESGWUEGFOQgj2YdtO1iSsT9V769LwbDdQRu9QlgzzmA534wBrebnSlC_OD318x-CvrLa8j3rnux90T-W7BvVEotLkMKhpHwLSrkJVSS341yByfqAWmQ">
+</div>
+<h3 class="font-bold text-xs text-[#102A4C]">Skyline Water Bottle</h3>
+<div class="text-sm font-bold text-[#102A4C] mt-0.5">₹400</div>
+</div>
+<div class="p-3 pt-0 space-y-2">
+<select class="w-full text-xs py-1 px-2 rounded-md border border-[#DCE6F2] bg-white text-slate-700 focus:ring-1 focus:ring-[#1463D8] focus:border-[#1463D8]">
+<option>One Size (750ml)</option>
+</select>
+<button class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-xs transition">
+                    Add to Cart
+                  </button>
+</div>
+</div>
+<!-- Merch 5: Skyline Canvas Tote (Fills expanded view) -->
+<div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition">
+<div class="p-3">
+<div class="h-36 bg-slate-50 rounded-lg flex items-center justify-center p-2 mb-3">
+<img alt="Skyline Tote Bag" class="h-full object-contain mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLks4Mae-To_-wI4hVg7WjWmk4DUpgtQfWBY6PZHgfHKycC1RDXFHr-BLlfneM8rRMNy7e8C11Il7OvUdgkLC_6gifrNX1jssWmWcJCXss1XXcLwodCpuLx759KUXHi7TEa7fEA7d4ycDqlKgUCqYdjX8xvWmKim2o7n-B1cdUkfu0sKemu9c3bPO3sE5okWESbNfPTwuydWXj4qqp4f3RDhUNLBlReXCuDHgLJ_zJl90QpoRBleveAQ">
+</div>
+<h3 class="font-bold text-xs text-[#102A4C]">Skyline Canvas Tote</h3>
+<div class="text-sm font-bold text-[#102A4C] mt-0.5">₹300</div>
+</div>
+<div class="p-3 pt-0 space-y-2">
+<select class="w-full text-xs py-1 px-2 rounded-md border border-[#DCE6F2] bg-white text-slate-700 focus:ring-1 focus:ring-[#1463D8] focus:border-[#1463D8]">
+<option>Standard Size</option>
+</select>
+<button class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-xs transition">
+                    Add to Cart
+                  </button>
+</div>
+</div>
+</div>
+<!-- Carousel Nav Right -->
+<button aria-label="Next Merchandise" class="absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-[#DCE6F2] shadow-md text-slate-600 hover:text-[#1463D8] flex items-center justify-center z-10 transition opacity-90 hover:opacity-100 hover:scale-105" id="merchScrollRight">
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</button>
+</div>
+</section>
+<section class="bg-white border border-[#DCE6F2] rounded-xl p-6 shadow-sm">
+  <div class="flex flex-col lg:flex-row items-center gap-6">
+    <!-- Left Side Content (~58%) -->
+    <div class="w-full lg:w-[58%] flex flex-col items-start">
+      <span class="text-xs font-semibold uppercase tracking-wider text-[#1463D8] mb-1">About Skyline</span>
+      <h2 class="text-xl sm:text-2xl font-bold text-[#102A4C] leading-snug">About Skyline Student Association</h2>
+      <div class="w-10 h-0.5 bg-[#1463D8] rounded-full my-2.5"></div>
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+        Skyline Student Association is a student-run community dedicated to creating meaningful experiences beyond the classroom. We organize events, manage membership programs, offer official merchandise, and create opportunities for students to connect, contribute, and grow.
+      </p>
+      <a href="#" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-medium rounded-lg shadow-sm transition">
+        Learn More <i class="fa-solid fa-arrow-right text-[10px]"></i>
+      </a>
+    </div>
+    <!-- Right Side 2x2 Feature Grid (~42%) -->
+    <div class="w-full lg:w-[42%] grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+      <!-- Card 1: Events -->
+      <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1463D8] flex items-center justify-center shrink-0 text-xs">
+          <i class="fa-solid fa-calendar-days"></i>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-xs font-semibold text-[#102A4C] truncate">Events</h3>
+          <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Engaging events throughout the year</p>
+        </div>
+      </div>
+      <!-- Card 2: Merchandise -->
+      <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1463D8] flex items-center justify-center shrink-0 text-xs">
+          <i class="fa-solid fa-bag-shopping"></i>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-xs font-semibold text-[#102A4C] truncate">Merchandise</h3>
+          <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Official Skyline merch for students</p>
+        </div>
+      </div>
+      <!-- Card 3: Community -->
+      <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1463D8] flex items-center justify-center shrink-0 text-xs">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-xs font-semibold text-[#102A4C] truncate">Community</h3>
+          <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Connect, create and belong</p>
+        </div>
+      </div>
+      <!-- Card 4: Opportunities -->
+      <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1463D8] flex items-center justify-center shrink-0 text-xs">
+          <i class="fa-solid fa-crown"></i>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-xs font-semibold text-[#102A4C] truncate">Opportunities</h3>
+          <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Volunteer, lead and grow</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section></div>
+<!-- RIGHT COLUMN: Collapsible Sidebar (25% default width, collapses smoothly to 0 with independent vertical scroll) -->
+<aside class="w-full lg:w-[25%] shrink-0 space-y-6 transition-all duration-300" id="sidebar-col">
+<!-- Sidebar Header / Quick Action Panel -->
+<div class="bg-gradient-to-r from-blue-50/70 to-indigo-50/50 border border-[#DCE6F2] rounded-xl p-3 flex items-center justify-between shadow-2xs">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-md bg-[#1463D8] text-white flex items-center justify-center text-[10px]">
+<i class="fa-solid fa-user-shield"></i>
+</div>
+<span class="text-xs font-bold text-[#102A4C]">Personal Desk</span>
+</div>
+<button class="text-slate-400 hover:text-[#102A4C] text-xs p-1 rounded transition" id="sidebarCollapseHeaderBtn" title="Hide Sidebar">
+<i class="fa-solid fa-chevron-right"></i>
+</button>
+</div>
+<!-- CARD 1: Announcements -->
+<div class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs">
+<div class="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
+<h2 class="text-sm font-bold text-[#102A4C]">Announcements</h2>
+<a class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1" href="#">
+              View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+</a>
+</div>
+<div class="divide-y divide-slate-100">
+<!-- Item 1 -->
+<div class="py-3 flex items-start gap-3">
+<div class="w-9 h-9 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center shrink-0 mt-0.5 text-xs">
+<i class="fa-solid fa-bullhorn"></i>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-xs font-bold text-[#102A4C] hover:text-[#1463D8] cursor-pointer transition truncate">Membership Renewal Open!</h3>
+<span class="block text-[10px] text-slate-400 mt-0.5">Oct 20, 2024</span>
+<p class="text-[11px] text-slate-500 mt-1 leading-snug">Renew now to continue enjoying member benefits.</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="py-3 flex items-start gap-3">
+<div class="w-9 h-9 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0 mt-0.5 text-xs">
+<i class="fa-regular fa-calendar-days"></i>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-xs font-bold text-[#102A4C] hover:text-[#1463D8] cursor-pointer transition truncate">Spring Gala Tickets Now Live</h3>
+<span class="block text-[10px] text-slate-400 mt-0.5">Oct 18, 2024</span>
+<p class="text-[11px] text-slate-500 mt-1 leading-snug">Book your tickets before they sell out!</p>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="py-3 flex items-start gap-3">
+<div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 mt-0.5 text-xs">
+<i class="fa-solid fa-users"></i>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-xs font-bold text-[#102A4C] hover:text-[#1463D8] cursor-pointer transition truncate">Volunteer Sign-ups Open</h3>
+<span class="block text-[10px] text-slate-400 mt-0.5">Oct 15, 2024</span>
+<p class="text-[11px] text-slate-500 mt-1 leading-snug">Be a part of our upcoming events.</p>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="pt-3 flex items-start gap-3">
+<div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center shrink-0 mt-0.5 text-xs">
+<i class="fa-solid fa-bag-shopping"></i>
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-xs font-bold text-[#102A4C] hover:text-[#1463D8] cursor-pointer transition truncate">Merchandise Restocked</h3>
+<span class="block text-[10px] text-slate-400 mt-0.5">Oct 12, 2024</span>
+<p class="text-[11px] text-slate-500 mt-1 leading-snug">New hoodies and T-shirts are now available!</p>
+</div>
+</div>
+</div>
+</div>
+<!-- CARD 2: My Tickets -->
+<div class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs">
+<div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+<h2 class="text-sm font-bold text-[#102A4C]">My Tickets</h2>
+<a class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1" href="#">
+              View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+</a>
+</div>
+<div class="space-y-3">
+<!-- Ticket Item 1 -->
+<div class="p-2.5 rounded-lg border border-[#DCE6F2] hover:border-slate-300 transition">
+<div class="flex gap-2.5">
+<img alt="Spring Gala Thumbnail" class="w-14 h-14 rounded-md object-cover shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTbUdd80kXZXnAdjem75pOhA-XvzWIEGuPZyfbHSGwfHRJSBXXkTowG38NV7bdOlfCRGSPwpq_4NGu-eBUvTMHcCantU-mrRtKY0d-SeJyjNXHgGNooTicFsLex-j4RqcWcB915EUrDzL-jBxKsNhNsxtRai4OcyTyDlJFO6aQLQZ8y6K1x861tPwlm2nSMmZUKOH1mEQ9tQy0DighcECUJpytACxZDGUnjEj0qrDouc-Z-LB8PIvshA">
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="text-xs font-bold text-[#102A4C] truncate">Spring Gala</h3>
+<span class="bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-1.5 py-0.2 rounded border border-emerald-200">Confirmed</span>
+</div>
+<div class="text-[10px] text-slate-400 mt-1 space-y-0.5">
+<div class="flex items-center gap-1 truncate"><i class="fa-regular fa-calendar text-[9px]"></i> 15 Nov 2024, 6:00 PM</div>
+<div class="flex items-center gap-1 truncate"><i class="fa-solid fa-location-dot text-[9px]"></i> Main Auditorium</div>
+</div>
+</div>
+</div>
+<button class="mt-2.5 w-full py-1 text-xs font-medium text-[#1463D8] bg-blue-50/60 hover:bg-blue-100 rounded flex items-center justify-center gap-1 transition">
+<i class="fa-solid fa-ticket text-[10px]"></i> View Ticket
+              </button>
+</div>
+<!-- Ticket Item 2 -->
+<div class="p-2.5 rounded-lg border border-[#DCE6F2] hover:border-slate-300 transition">
+<div class="flex gap-2.5">
+<img alt="Tech Talk Thumbnail" class="w-14 h-14 rounded-md object-cover shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo1Nhux3dtz0edKJvTdOQS47stQqrRonEW7gaYdKL-CZiMph8L68aTbNiNcZmbLRb8EZvXXfdWngWb03dlGFfOpCaYgF2mZHZ7pLYPcA4qvVp5vfLzKmxNfST-PwzQ4Vj9gBIXdAAarApErdUC4APtVrbHxty4uLX2e31VnWTCYhnQS2JM6uZVN0ijzOYsBdRvFL7UsiDrOGDb-JLeD_Saz-W02kYO4roJAMKivf6YhAjgybciNrynZA">
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="text-xs font-bold text-[#102A4C] truncate">Tech Talk Series</h3>
+<span class="bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-1.5 py-0.2 rounded border border-emerald-200">Confirmed</span>
+</div>
+<div class="text-[10px] text-slate-400 mt-1 space-y-0.5">
+<div class="flex items-center gap-1 truncate"><i class="fa-regular fa-calendar text-[9px]"></i> 22 Nov 2024, 4:00 PM</div>
+<div class="flex items-center gap-1 truncate"><i class="fa-solid fa-location-dot text-[9px]"></i> Block B</div>
+</div>
+</div>
+</div>
+<button class="mt-2.5 w-full py-1 text-xs font-medium text-[#1463D8] bg-blue-50/60 hover:bg-blue-100 rounded flex items-center justify-center gap-1 transition">
+<i class="fa-solid fa-ticket text-[10px]"></i> View Ticket
+              </button>
+</div>
+</div>
+</div>
+<!-- CARD 3: My Orders -->
+<div class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs">
+<div class="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
+<h2 class="text-sm font-bold text-[#102A4C]">My Orders</h2>
+<a class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1" href="#">
+              View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+</a>
+</div>
+<div class="divide-y divide-slate-100">
+<!-- Order Item 1 -->
+<div class="py-2.5 flex items-center justify-between gap-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center p-1 shrink-0">
+<img alt="Skyline Hoodie" class="h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHMUbiu_K5KE6hdtEHBqHJxvOVWTtCEcf8E0x8k6yIumE2tQvSrNcGwLR13UcPREkJPT8Wm80i5q9nDhikX11Lau0Gb7qvuVYp4dNpIrGop8qmO49kt2whtRhiiKNAR0TFDXSTuI75axeAI3sH0KYU9Kj5iUxnaP4ap4uaNkLpGDXlV94ewnGDWelOjyEXrS9pkvBP48r_8kWHr-aWdzeOJFfOTcn0CmuV0l_AHGJ5JGAwWqfeH3_K2Q">
+</div>
+<div>
+<h3 class="text-xs font-bold text-[#102A4C] group-hover:text-[#1463D8] transition">Skyline Hoodie</h3>
+<span class="block text-[10px] text-slate-400">Size: M | Qty: 1</span>
+<span class="text-xs font-bold text-[#102A4C] block mt-0.5">₹800</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="bg-blue-50 text-[#1463D8] text-[10px] font-semibold px-2 py-0.5 rounded border border-blue-100">Processing</span>
+<i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:text-slate-500"></i>
+</div>
+</div>
+<!-- Order Item 2 -->
+<div class="pt-2.5 flex items-center justify-between gap-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center p-1 shrink-0">
+<img alt="Skyline Bottle" class="h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXGjL7ykYST2-706AjR4qPEVWsoBOKjcm4ZiSlrB4GNgREbInxUBRav2kbLZWYtQ3s9hAPGJRzCNNNdwGBRrLHVY6veFztQQsHp1BMbA-FpLk5fVXzOXDjeO9vtS4XvE74A5eD9pPVEQSUV6iG_3x_FNaRLFZIdQhbVhcK-vU39btYo1CPqInC10xkGn6CPebEHCf0L2DIji_dIXnKrgMfcJG2MsCEcdnaXC89D9-wi1D8X4xk8Y59rA">
+</div>
+<div>
+<h3 class="text-xs font-bold text-[#102A4C] group-hover:text-[#1463D8] transition">Skyline Water Bottle</h3>
+<span class="block text-[10px] text-slate-400">Qty: 1</span>
+<span class="text-xs font-bold text-[#102A4C] block mt-0.5">₹400</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-2 py-0.5 rounded border border-emerald-100">Delivered</span>
+<i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:text-slate-500"></i>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- END: ContentSplitGrid -->
+</main>
+<!-- END: PageContent -->
+<!-- Floating Re-open Button (Visible when sidebar collapsed) -->
+<div class="fixed right-0 top-1/2 -translate-y-1/2 z-40 hidden" id="reopenSidebarContainer">
+<button class="flex items-center gap-2 bg-[#1463D8] hover:bg-[#1052B5] text-white py-2.5 px-3 rounded-l-xl shadow-xl transition transform active:scale-95" id="reopenSidebarBtn" title="Show Personal Dashboard">
+<i class="fa-solid fa-chevron-left text-xs"></i>
+<span class="text-xs font-semibold writing-mode-vertical sm:writing-mode-horizontal tracking-wide">Personal Sidebar</span>
+</button>
+</div>
+<!-- BEGIN: MinimalFooter -->
+<footer class="mt-12 border-t border-[#DCE6F2] bg-white py-6">
+<div class="max-w-[1440px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+<div class="flex items-center gap-2"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC61d60qzYmgLaF068Qdot7gEUhfpZbjgnGsfiDDDGtl38qbYZAGDV5zrP0M9yrl9ipTyzIRsDCEcRuURMIR91y9ycRh_QVb_v6iUnKDcH7lwlkyyeHQAtto4Rqwhkiex-RSquxNtM7EDdBBP5xCbbfPeYOZ3cOYLbYFhVAyv6fPKGc_weUXb9FUAVBT_FlkvphupmSEo8_qclRkRmkMnmA4U-Hq8AQu2lGiFss1kbOQqHBl7fpOaU9nSUk5wkJ9GeatR4" alt="Skyline" class="h-6 w-auto object-contain inline-block"><span class="font-semibold text-slate-700">Skyline Student Association</span><span class="">• © 2024 All Rights Reserved</span></div>
+<div class="flex items-center gap-6">
+<a class="hover:text-[#1463D8]" href="#">Privacy Policy</a>
+<a class="hover:text-[#1463D8]" href="#">Terms of Service</a>
+<a class="hover:text-[#1463D8]" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+<!-- END: MinimalFooter -->
+<!-- Script for Collapsible Sidebar & Carousel Controls -->
+<script data-purpose="dashboard-functionality">
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. SIDEBAR COLLAPSE / EXPAND LOGIC
+      const dashboard = document.getElementById('dashboard-container');
+      const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+      const sidebarCollapseHeaderBtn = document.getElementById('sidebarCollapseHeaderBtn');
+      const reopenSidebarBtn = document.getElementById('reopenSidebarBtn');
+      const reopenSidebarContainer = document.getElementById('reopenSidebarContainer');
+      const toggleText = document.getElementById('toggleText');
+      const toggleIcon = document.getElementById('toggleIcon');
+      const viewBadge = document.getElementById('view-state-badge');
+
+      function toggleSidebar() {
+        const isCollapsed = dashboard.classList.toggle('sidebar-collapsed');
+        if (isCollapsed) {
+          toggleText.textContent = 'Expand Sidebar';
+          toggleIcon.className = 'fa-solid fa-bars text-[#1463D8]';
+          viewBadge.textContent = 'Full Width (100%)';
+          viewBadge.className = 'bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold px-2 py-0.5 rounded-full';
+          reopenSidebarContainer.classList.remove('hidden');
+        } else {
+          toggleText.textContent = 'Collapse Sidebar';
+          toggleIcon.className = 'fa-solid fa-table-columns text-slate-400 group-hover:text-[#1463D8]';
+          viewBadge.textContent = 'Split View (75/25)';
+          viewBadge.className = 'bg-blue-50 text-[#1463D8] border border-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-full';
+          reopenSidebarContainer.classList.add('hidden');
+        }
+      }
+
+      if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', toggleSidebar);
+      if (sidebarCollapseHeaderBtn) sidebarCollapseHeaderBtn.addEventListener('click', toggleSidebar);
+      if (reopenSidebarBtn) reopenSidebarBtn.addEventListener('click', toggleSidebar);
+
+      // 2. EVENTS CAROUSEL (Independent horizontal scrolling)
+      const eventContainer = document.getElementById('eventsContainer');
+      const eventLeft = document.getElementById('eventScrollLeft');
+      const eventRight = document.getElementById('eventScrollRight');
+      const eventLeftH = document.getElementById('eventScrollLeftHeader');
+      const eventRightH = document.getElementById('eventScrollRightHeader');
+
+      const scrollEvents = (amount) => {
+        if (eventContainer) {
+          eventContainer.scrollBy({ left: amount, behavior: 'smooth' });
+        }
+      };
+
+      if (eventLeft) eventLeft.addEventListener('click', () => scrollEvents(-280));
+      if (eventRight) eventRight.addEventListener('click', () => scrollEvents(280));
+      if (eventLeftH) eventLeftH.addEventListener('click', () => scrollEvents(-280));
+      if (eventRightH) eventRightH.addEventListener('click', () => scrollEvents(280));
+
+      // 3. MERCHANDISE CAROUSEL (Independent horizontal scrolling)
+      const merchContainer = document.getElementById('merchContainer');
+      const merchLeft = document.getElementById('merchScrollLeft');
+      const merchRight = document.getElementById('merchScrollRight');
+      const merchLeftH = document.getElementById('merchScrollLeftHeader');
+      const merchRightH = document.getElementById('merchScrollRightHeader');
+
+      const scrollMerch = (amount) => {
+        if (merchContainer) {
+          merchContainer.scrollBy({ left: amount, behavior: 'smooth' });
+        }
+      };
+
+      if (merchLeft) merchLeft.addEventListener('click', () => scrollMerch(-280));
+      if (merchRight) merchRight.addEventListener('click', () => scrollMerch(280));
+      if (merchLeftH) merchLeftH.addEventListener('click', () => scrollMerch(-280));
+      if (merchRightH) merchRightH.addEventListener('click', () => scrollMerch(280));
+    });
+  </script>
+</body></html>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_skyline_ticket_tree" model="ir.ui.view">
+        <field name="name">skyline.ticket.tree</field>
+        <field name="model">skyline.ticket</field>
+        <field name="arch" type="xml">
+            <tree string="Event Registrations &amp; Tickets" decoration-success="status == 'checked_in'" decoration-info="status == 'confirmed'">
+                <field name="name"/>
+                <field name="event_id"/>
+                <field name="partner_id"/>
+                <field name="event_date"/>
+                <field name="price_paid"/>
+                <field name="is_member_rate"/>
+                <field name="status" widget="badge" decoration-success="status == 'checked_in'" decoration-info="status == 'confirmed'"/>
+                <field name="checkin_time"/>
+                <button name="action_checkin" string="Check In" type="object" class="oe_highlight" invisible="status == 'checked_in'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_skyline_ticket_form" model="ir.ui.view">
+        <field name="name">skyline.ticket.form</field>
+        <field name="model">skyline.ticket</field>
+        <field name="arch" type="xml">
+            <form string="Ticket &amp; Registration">
+                <header>
+                    <button name="action_checkin" string="Check In Attendee" type="object" class="oe_highlight" invisible="status == 'checked_in'"/>
+                    <button name="action_cancel" string="Cancel Ticket" type="object" invisible="status == 'cancelled'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="confirmed,checked_in,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Ticket Number"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Attendee &amp; Event">
+                            <field name="partner_id"/>
+                            <field name="event_id"/>
+                            <field name="event_date"/>
+                            <field name="event_time"/>
+                            <field name="event_location"/>
+                        </group>
+                        <group string="Payment &amp; Check-In">
+                            <field name="price_paid"/>
+                            <field name="is_member_rate"/>
+                            <field name="registration_date"/>
+                            <field name="checkin_time" readonly="1"/>
+                            <field name="qr_code_token" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_skyline_ticket" model="ir.actions.act_window">
+        <field name="name">Event Attendance &amp; Tickets</field>
+        <field name="res_model">skyline.ticket</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

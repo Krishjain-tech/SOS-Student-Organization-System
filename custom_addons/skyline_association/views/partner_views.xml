@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_skyline_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.skyline.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Skyline Student Portal" name="skyline_portal">
+                    <group>
+                        <group string="Association Info">
+                            <field name="is_student"/>
+                            <field name="student_id_number"/>
+                            <field name="membership_status" widget="badge"/>
+                            <field name="member_discount"/>
+                            <field name="membership_expiry"/>
+                        </group>
+                    </group>
+                    <group string="Memberships">
+                        <field name="membership_ids" nolabel="1">
+                            <tree>
+                                <field name="name"/>
+                                <field name="plan_name"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="discount_percent"/>
+                                <field name="status" widget="badge"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group string="Tickets">
+                        <field name="ticket_ids" nolabel="1">
+                            <tree>
+                                <field name="name"/>
+                                <field name="event_id"/>
+                                <field name="price_paid"/>
+                                <field name="status" widget="badge"/>
+                                <field name="checkin_time"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group string="Merchandise Orders">
+                        <field name="order_ids" nolabel="1">
+                            <tree>
+                                <field name="name"/>
+                                <field name="date_order"/>
+                                <field name="amount_total"/>
+                                <field name="status" widget="badge"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_skyline_students" model="ir.actions.act_window">
+        <field name="name">Students &amp; Members</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_student', '=', True)]</field>
+        <field name="context">{'default_is_student': True}</field>
+    </record>
+</odoo>

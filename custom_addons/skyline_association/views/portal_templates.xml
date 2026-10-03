@@ -1,0 +1,2119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_homepage_template" name="Skyline Student Association Portal">
+        &lt;!DOCTYPE html&gt;
+        <html lang="en">
+        <head>
+            <meta charset="utf-8"/>
+            <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+            <title>Skyline Student Association</title>
+            
+            <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+            <link href="https://fonts.googleapis.com" rel="preconnect"/>
+            <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+            
+            <!-- FontAwesome Icons (Local Offline) -->
+            <link href="/skyline_association/static/lib/fontawesome/css/all.min.css" rel="stylesheet"/>
+            
+            <!-- Tailwind CSS (Local Offline) -->
+            <script src="/skyline_association/static/lib/tailwind.js"></script>
+            <script>
+                tailwind.config = {
+                  theme: {
+                    extend: {
+                      colors: {
+                        brand: {
+                          50: '#eff6ff',
+                          100: '#dbeafe',
+                          500: '#1463D8',
+                          600: '#1052B5',
+                          700: '#0c3c84',
+                          navy: '#102A4C',
+                          dark: '#0B1E36',
+                          border: '#DCE6F2',
+                          bg: '#F7FAFE'
+                        }
+                      },
+                      fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+                      }
+                    }
+                  }
+                };
+            </script>
+            
+            <style>
+                .no-scrollbar::-webkit-scrollbar {
+                  display: none;
+                }
+                .no-scrollbar {
+                  -ms-overflow-style: none;
+                  scrollbar-width: none;
+                }
+                #main-content-col {
+                  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), flex 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                #sidebar-col {
+                  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .sidebar-collapsed #sidebar-col {
+                  width: 0 !important;
+                  min-width: 0 !important;
+                  opacity: 0 !important;
+                  overflow: hidden !important;
+                  pointer-events: none !important;
+                  margin-left: 0 !important;
+                  padding-left: 0 !important;
+                  padding-right: 0 !important;
+                  transform: translateX(20px);
+                }
+                .sidebar-collapsed #main-content-col {
+                  width: 100% !important;
+                  max-width: 100% !important;
+                  flex: 1 1 100% !important;
+                }
+                @keyframes slideDown {
+                  from { opacity: 0; transform: translateY(-8px); }
+                  to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-slide-down {
+                  animation: slideDown 0.2s ease-out forwards;
+                }
+                .toast-notification {
+                  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+            </style>
+            <script>
+                window.SKYLINE_IS_MEMBER = <t t-esc="'true' if is_member else 'false'"/>;
+                window.SKYLINE_MEMBERSHIP_STATUS = "<t t-esc="membership_status or 'none'"/>";
+                window.SKYLINE_MEMBERSHIP_EXPIRY = "<t t-esc="membership_expiry"/>";
+                window.SKYLINE_MEMBERSHIP_EXPIRY_LONG = "<t t-esc="membership_expiry_long or membership_expiry"/>";
+            </script>
+        </head>
+        <body class="bg-[#F7FAFE] text-slate-700 antialiased font-sans min-h-screen">
+
+        <!-- Toast Notification Area -->
+        <div id="toast-container" class="fixed top-20 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+        <!-- BEGIN: MainHeader -->
+        <header class="sticky top-0 z-40 bg-white border-b border-[#DCE6F2] shadow-sm">
+        <div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between gap-6">
+            <!-- Brand Logo -->
+            <a href="/" class="flex items-center gap-3 shrink-0 cursor-pointer">
+                <img src="/skyline_association/static/src/img/logo.png" alt="Skyline" class="w-auto object-contain h-14"/>
+                <div class="leading-none hidden sm:block border-l border-[#DCE6F2] pl-3">
+                    <span class="block text-[11px] font-semibold text-slate-400 tracking-wider uppercase">Student Association</span>
+                </div>
+            </a>
+            
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center space-x-7 font-medium text-sm text-slate-600">
+                <a t-attf-class="py-5 transition-colors #{'relative text-[#1463D8] font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#1463D8]' if active_tab == 'home' else 'hover:text-[#1463D8]'}" href="/">Home</a>
+                <a t-attf-class="py-5 transition-colors #{'relative text-[#1463D8] font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#1463D8]' if active_tab == 'events' else 'hover:text-[#1463D8]'}" href="#events-section" onclick="document.getElementById('events-section').scrollIntoView({behavior: 'smooth'}); return false;">Events</a>
+                <a t-attf-class="py-5 transition-colors #{'relative text-[#1463D8] font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#1463D8]' if active_tab == 'merchandise' else 'hover:text-[#1463D8]'}" href="#merch-section" onclick="document.getElementById('merch-section').scrollIntoView({behavior: 'smooth'}); return false;">Merchandise</a>
+                <a t-attf-class="py-5 transition-colors #{'relative text-[#1463D8] font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#1463D8]' if active_tab == 'announcements' else 'hover:text-[#1463D8]'}" href="#announcements-section" onclick="document.getElementById('announcements-section').scrollIntoView({behavior: 'smooth'}); return false;">Announcements</a>
+                <a t-attf-class="py-5 transition-colors #{'relative text-[#1463D8] font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#1463D8]' if active_tab == 'about' else 'hover:text-[#1463D8]'}" href="#about-section" onclick="document.getElementById('about-section').scrollIntoView({behavior: 'smooth'}); return false;">About</a>
+            </nav>
+            
+            <!-- Search & Profile Controls -->
+            <div class="flex items-center gap-4 shrink-0">
+                <!-- Search Field -->
+                <div class="relative hidden sm:block w-72">
+                    <input id="searchInput" class="w-full pl-9 pr-4 py-1.5 text-xs bg-slate-50 border border-[#DCE6F2] rounded-full focus:outline-none focus:ring-2 focus:ring-[#1463D8]/30 focus:border-[#1463D8] transition placeholder:text-slate-400 text-slate-700" placeholder="Search events, merchandise..." type="text" autocomplete="off"/>
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+                    
+                    <!-- Live Search Results Dropdown -->
+                    <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-xl border border-[#DCE6F2] shadow-xl p-3 z-50 animate-slide-down">
+                        <div id="searchEventsGroup" class="mb-3 hidden">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Events</span>
+                            <div id="searchEventsResults" class="space-y-1"></div>
+                        </div>
+                        <div id="searchMerchGroup" class="hidden">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Merchandise</span>
+                            <div id="searchMerchResults" class="space-y-1"></div>
+                        </div>
+                        <div id="searchEmptyState" class="text-xs text-slate-400 text-center py-2 hidden">No results found</div>
+                    </div>
+                </div>
+                
+                <!-- Cart Button -->
+                <button id="cartBtn" aria-label="Shopping Cart" onclick="openMyOrdersModal('cart');" data-action="open-my-orders" class="relative p-2 text-slate-600 hover:text-[#1463D8] hover:bg-slate-50 rounded-full transition cursor-pointer">
+                    <i class="fa-solid fa-cart-shopping text-base"></i>
+                    <span id="cartCountBadge" class="absolute top-0 right-0 w-4 h-4 bg-[#1463D8] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white"><t t-esc="cart_count"/></span>
+                </button>
+                
+                <!-- User Profile Pill -->
+                <div class="relative">
+                    <div id="userProfileBtn" class="flex items-center gap-2 pl-2 border-l border-[#DCE6F2] cursor-pointer group">
+                        <div class="w-8 h-8 rounded-full bg-[#102A4C] text-white text-xs font-semibold flex items-center justify-center ring-2 ring-transparent group-hover:ring-[#1463D8] transition">
+                            <t t-if="partner and partner.name">
+                                <t t-esc="''.join([p[0].upper() for p in partner.name.split()[:2]])"/>
+                            </t>
+                            <t t-else="">AP</t>
+                        </div>
+                        <div class="hidden lg:flex flex-col items-start leading-tight">
+                            <span class="text-xs font-semibold text-[#102A4C]">
+                                <t t-if="partner"><t t-esc="partner.name"/></t>
+                                <t t-else="">Aarav Patel</t>
+                            </span>
+                            <span id="headerUserStatus" class="text-[10px] text-slate-500 font-medium">
+                                <t t-if="is_member">Skyline Plus Member</t>
+                                <t t-elif="is_expired">Membership Expired</t>
+                                <t t-else="">Non-member</t>
+                            </span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-hover:text-slate-600 transition ml-1"></i>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-64 bg-white rounded-xl border border-[#DCE6F2] shadow-xl py-2 z-50 animate-slide-down">
+                        <div class="px-4 py-2 border-b border-slate-100">
+                            <p class="text-xs font-bold text-[#102A4C]"><t t-esc="partner.name if partner else 'Aarav Patel'"/></p>
+                            <p class="text-[11px] text-slate-400 truncate"><t t-esc="partner.email if partner else 'aarav.patel@skyline.edu'"/></p>
+                            <div class="mt-1 flex items-center gap-1.5">
+                                <span id="dropdownMembershipBadge" t-attf-class="text-[10px] font-semibold px-2 py-0.5 rounded-full #{'bg-emerald-50 text-emerald-700 border border-emerald-200' if is_member else ('bg-amber-50 text-amber-700 border border-amber-200' if is_expired else 'bg-slate-100 text-slate-600 border border-slate-200')}">
+                                    <t t-if="is_member">Skyline Plus Member</t>
+                                    <t t-elif="is_expired">Membership Expired</t>
+                                    <t t-else="">Non-member</t>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="py-1 text-xs text-slate-600">
+                            <button onclick="toggleMembershipDemo();" class="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center justify-between text-slate-700 cursor-pointer">
+                                <span>Switch Membership Status</span>
+                                <i class="fa-solid fa-arrows-rotate text-xs text-[#1463D8]"></i>
+                            </button>
+                            <a href="/web" target="_blank" class="w-full block px-4 py-2 hover:bg-slate-50 text-slate-700 flex items-center justify-between">
+                                <span>Admin / Staff Backend</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </header>
+        <!-- END: MainHeader -->
+
+        <!-- BEGIN: PageContent -->
+        <main class="max-w-[1440px] mx-auto px-6 py-6 space-y-6">
+
+        <!-- BEGIN: HeroBanner -->
+        <section class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-white via-[#F7FAFE] to-[#EFF6FE] border border-[#DCE6F2] shadow-sm flex flex-col lg:flex-row items-stretch min-h-[350px] lg:min-h-[370px]">
+            <!-- Hero Details Left Content (42-44%) -->
+            <div class="relative z-10 w-full lg:w-[44%] xl:w-[42%] p-7 sm:p-9 lg:p-10 xl:p-12 flex flex-col justify-center shrink-0">
+                <span class="inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#1463D8] mb-2 sm:mb-2.5">Skyline Student Association</span>
+                <h1 class="text-3xl sm:text-4xl lg:text-[40px] xl:text-[44px] font-extrabold text-[#102A4C] tracking-tight leading-[1.12] mb-3 sm:mb-4">
+                    Students. Events.<br class="hidden sm:inline"/>
+                    <span class="text-[#1463D8]">Community.</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-600 mb-6 leading-relaxed max-w-md font-normal">
+                    Join a vibrant community, attend exciting events, grab exclusive merchandise, and be part of something bigger.
+                </p>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a class="px-5 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-lg shadow-md shadow-blue-500/20 inline-flex items-center gap-2 transition transform active:scale-95 cursor-pointer" href="#events-section" onclick="document.getElementById('events-section').scrollIntoView({behavior: 'smooth'}); return false;">
+                        Explore Events <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                    <a class="px-5 py-2.5 bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8] text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer" href="#" onclick="openMembershipModal(); return false;">
+                        View Membership
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Right Visual Campus Imagery (56-58%) -->
+            <div class="relative w-full lg:w-[56%] xl:w-[58%] min-h-[250px] sm:min-h-[300px] lg:min-h-[370px] overflow-hidden select-none flex items-center justify-end">
+                <img alt="Students walking on university campus" class="w-full h-full object-cover object-right lg:object-center pointer-events-none" src="/skyline_association/static/src/img/hero_campus_banner.png?v=20261003_v2" srcset="/skyline_association/static/src/img/hero_campus_banner@2x.png?v=20261003_v2 2x"/>
+                
+                <!-- Interactive Quick Access Hotspots over organic shape -->
+                <div class="absolute right-0 bottom-0 w-[42%] h-[60%] z-20 flex flex-col justify-end items-end p-4 sm:p-5 pointer-events-auto">
+                    <div class="w-full flex flex-col items-end gap-1.5 sm:gap-2.5 pr-1">
+                        <a href="#events-section" onclick="if(typeof openAllEventsModal === 'function'){ openAllEventsModal(); } else { document.getElementById('events-section').scrollIntoView({behavior: 'smooth'}); } return false;" class="block w-36 h-6 cursor-pointer rounded hover:bg-white/10 transition" title="View Events"></a>
+                        <a href="#merchandise-section" onclick="if(typeof openAllMerchModal === 'function'){ openAllMerchModal(); } else { document.getElementById('merchandise-section').scrollIntoView({behavior: 'smooth'}); } return false;" class="block w-36 h-6 cursor-pointer rounded hover:bg-white/10 transition" title="View Merchandise"></a>
+                        <a href="#about-section" onclick="document.getElementById('about-section').scrollIntoView({behavior: 'smooth'}); return false;" class="block w-36 h-6 cursor-pointer rounded hover:bg-white/10 transition" title="Skyline Community"></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- END: HeroBanner -->
+
+        <!-- BEGIN: MembershipHighlight -->
+        <section id="membership-section" class="rounded-xl border border-[#DCE6F2] bg-gradient-to-r from-[#F0F6FD] via-[#F4F8FE] to-[#EEF5FE] p-4 lg:p-5 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4">
+            <!-- Membership Promo Left -->
+            <div class="w-full lg:w-1/3 pr-2">
+                <h2 class="text-base font-bold text-[#102A4C]">Your Membership</h2>
+                <t t-if="is_member and is_expiring_soon">
+                    <p id="dashMembershipDesc" class="text-xs text-amber-700 font-medium mt-0.5 mb-3">Membership expires soon. Renew to keep your benefits.</p>
+                    <button id="membershipDetailsBtn" onclick="openMembershipModal();" class="px-4 py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-sm transition cursor-pointer">
+                        Renew Membership
+                    </button>
+                </t>
+                <t t-elif="is_member">
+                    <p id="dashMembershipDesc" class="text-xs text-slate-500 mt-0.5 mb-3">Your membership is active.</p>
+                    <button id="membershipDetailsBtn" onclick="openMembershipModal();" class="px-4 py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-sm transition cursor-pointer">
+                        View Membership
+                    </button>
+                </t>
+                <t t-elif="is_expired">
+                    <p id="dashMembershipDesc" class="text-xs text-rose-600 font-medium mt-0.5 mb-3">Membership expired. Rejoin to unlock member benefits.</p>
+                    <button id="membershipDetailsBtn" onclick="openMembershipModal();" class="px-4 py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-sm transition cursor-pointer">
+                        Renew / Become a Member
+                    </button>
+                </t>
+                <t t-else="">
+                    <p id="dashMembershipDesc" class="text-xs text-slate-500 mt-0.5 mb-3">Not a member yet. Join Skyline Plus to unlock member benefits.</p>
+                    <button id="membershipDetailsBtn" onclick="openMembershipModal();" class="px-4 py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-md shadow-sm transition cursor-pointer">
+                        Become a Member
+                    </button>
+                </t>
+            </div>
+            
+            <!-- Quick Metrics Right -->
+            <div class="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- Card 1: Membership Status -->
+                <div class="bg-white border border-[#DCE6F2] rounded-lg p-3 flex items-center gap-3 shadow-xs">
+                    <div class="w-10 h-10 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-base">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-[#102A4C]" id="dashMembershipTitle">
+                                <t t-if="is_member">✓ Skyline Plus</t>
+                                <t t-elif="is_expired">Skyline Plus</t>
+                                <t t-else="">Skyline Plus</t>
+                            </span>
+                            <span id="dashMembershipBadge" t-attf-class="text-[10px] font-semibold px-1.5 py-0.2 rounded #{'bg-emerald-100 text-emerald-700' if is_member else ('bg-rose-100 text-rose-700' if is_expired else 'bg-slate-100 text-slate-600')}">
+                                <t t-if="is_member">Active</t>
+                                <t t-elif="is_expired">Expired</t>
+                                <t t-else="">Join Now</t>
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-0.5" id="dashMembershipSub">
+                            <t t-if="is_member and is_expiring_soon">Expires on: <t t-esc="membership_expiry_long or membership_expiry"/></t>
+                            <t t-elif="is_member">Valid until: <t t-esc="membership_expiry_long or membership_expiry"/></t>
+                            <t t-elif="is_expired">Expired on: <t t-esc="membership_expiry_long or membership_expiry"/></t>
+                            <t t-else="">Not a member yet</t>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Card 2: Benefits -->
+                <div class="bg-white border border-[#DCE6F2] rounded-lg p-3 flex items-center gap-3 shadow-xs">
+                    <div class="w-10 h-10 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-base">
+                        <i class="fa-solid fa-percent"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">Member Benefits</span>
+                        <div class="flex items-baseline gap-1 mt-0.5">
+                            <span id="dashDiscountRate" class="text-sm font-bold text-[#102A4C]"><t t-esc="discount_str"/></span>
+                            <span class="text-[11px] text-slate-500">20% off eligible events</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 3: Registrations -->
+                <div class="bg-white border border-[#DCE6F2] rounded-lg p-3 flex items-center gap-3 shadow-xs">
+                    <div class="w-10 h-10 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-base">
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">My Registrations</span>
+                        <div class="flex items-baseline gap-2 mt-0.5">
+                            <span id="metricRegistrationsCount" class="text-sm font-bold text-[#102A4C]"><t t-esc="total_registrations"/></span>
+                            <span id="metricDeliveryText" class="text-[11px] text-slate-500"><t t-esc="delivery_text"/></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- END: MembershipHighlight -->
+
+        <!-- DASHBOARD CONTROLS BAR: Collapse/Expand Sidebar Toggle -->
+        <div class="flex items-center justify-between pt-1">
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Dashboard View</span>
+                <span class="bg-blue-50 text-[#1463D8] border border-blue-200 text-[10px] font-semibold px-2 py-0.5 rounded-full" id="view-state-badge">Split View (75/25)</span>
+            </div>
+            <button class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-700 rounded-lg shadow-2xs transition group cursor-pointer" id="sidebarToggleBtn" title="Toggle personal sidebar visibility">
+                <i class="fa-solid fa-table-columns text-slate-400 group-hover:text-[#1463D8] transition-transform" id="toggleIcon"></i>
+                <span id="toggleText">Collapse Sidebar</span>
+                <span class="bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-[#1463D8] text-[10px] px-1.5 py-0.5 rounded font-mono transition">Tab</span>
+            </button>
+        </div>
+
+        <!-- BEGIN: ContentSplitGrid / Interactive Dashboard Layout -->
+        <div class="flex flex-col lg:flex-row gap-6 items-start transition-all duration-300" id="dashboard-container">
+
+            <!-- LEFT / MAIN COLUMN: Upcoming Events & Merchandise (75% default, 100% collapsed) -->
+            <div class="w-full lg:w-[75%] shrink-0 space-y-7 transition-all duration-300" id="main-content-col">
+
+                <!-- SECTION: Upcoming Events (Independent Horizontal Scroll Container) -->
+                <section id="events-section">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-lg font-bold text-[#102A4C] tracking-tight">Upcoming Events</h2>
+                            <span class="text-xs text-slate-400 hidden sm:inline">• Browse &amp; book tickets</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="hidden sm:flex items-center gap-1.5">
+                                <button aria-label="Previous Events" class="w-7 h-7 rounded-full bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-600 flex items-center justify-center transition shadow-2xs cursor-pointer" id="eventScrollLeftHeader">
+                                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                                </button>
+                                <button aria-label="Next Events" class="w-7 h-7 rounded-full bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-600 flex items-center justify-center transition shadow-2xs cursor-pointer" id="eventScrollRightHeader">
+                                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                </button>
+                            </div>
+                            <a href="#" data-action="open-all-events" class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1 cursor-pointer">
+                                View All Events <i class="fa-solid fa-arrow-right text-[10px] pointer-events-none"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Carousel Container -->
+                    <div class="relative group/events">
+                        <!-- Carousel Nav Left -->
+                        <button aria-label="Previous Events" class="absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-[#DCE6F2] shadow-md text-slate-600 hover:text-[#1463D8] flex items-center justify-center z-10 transition opacity-90 hover:opacity-100 hover:scale-105 cursor-pointer" id="eventScrollLeft">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+                        
+                        <!-- Event Cards Wrapper (Independent Horizontal Scroll Container) -->
+                        <div class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5" id="eventsContainer">
+                            <t t-foreach="events" t-as="event">
+                                <div class="w-[245px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition cursor-pointer event-card-trigger group" t-att-data-event-id="event.id" onclick="openEventDetailModal(this.getAttribute('data-event-id'));">
+                                    <div>
+                                        <div class="relative h-28 w-full overflow-hidden bg-slate-100">
+                                            <img t-att-src="event.image_url" t-att-alt="event.name" class="w-full h-full object-cover transition duration-300 group-hover:scale-105"/>
+                                            <!-- Date Badge -->
+                                            <div class="absolute top-2.5 left-2.5 bg-white/95 rounded-md px-2 py-0.5 text-center shadow-xs">
+                                                <span class="text-[9px] font-bold text-slate-500 uppercase block leading-tight"><t t-esc="event.month_short"/></span>
+                                                <span class="text-sm font-extrabold text-[#1463D8] leading-none"><t t-esc="event.day_num"/></span>
+                                            </div>
+                                        </div>
+                                        <div class="p-3.5 space-y-2">
+                                            <div class="flex items-center gap-2">
+                                                <h3 class="font-bold text-xs text-[#102A4C] truncate group-hover:text-[#1463D8] transition-colors"><t t-esc="event.name"/></h3>
+                                                <t t-if="event.tag">
+                                                    <span t-attf-class="text-[9px] font-bold px-1.5 py-0.5 rounded #{'bg-blue-100 text-[#1463D8]' if event.tag == 'Featured' else 'bg-emerald-100 text-emerald-700'}">
+                                                        <t t-esc="event.tag"/>
+                                                    </span>
+                                                </t>
+                                            </div>
+                                            <div class="space-y-1 text-[11px] text-slate-500">
+                                                <div class="flex items-center gap-1.5 truncate">
+                                                    <i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i>
+                                                    <span><t t-esc="event.location"/></span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 truncate">
+                                                    <i class="fa-regular fa-clock text-slate-400 text-[10px]"></i>
+                                                    <span><t t-esc="event.time_display"/></span>
+                                                </div>
+                                            </div>
+                                            <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                                                <t t-esc="event.description"/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="p-3.5 pt-0 mt-auto">
+                                        <div class="flex items-baseline gap-1.5 mb-2.5">
+                                            <t t-if="event.is_free">
+                                                <span class="text-xs font-bold text-emerald-600 uppercase">Free</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="text-xs font-bold text-[#102A4C]">₹<t t-esc="int(event.member_price) if event.member_price == int(event.member_price) else ('%.2f' % event.member_price)"/></span>
+                                                <span class="text-[10px] text-slate-400">Member</span>
+                                                <span class="text-slate-300">|</span>
+                                                <span class="text-xs font-bold text-slate-500">₹<t t-esc="int(event.non_member_price) if event.non_member_price == int(event.non_member_price) else ('%.2f' % event.non_member_price)"/></span>
+                                                <span class="text-[10px] text-slate-400">Non-member</span>
+                                            </t>
+                                        </div>
+                                        <t t-if="event.is_sold_out">
+                                            <button disabled="disabled" class="w-full py-1.5 bg-slate-200 text-slate-400 text-xs font-semibold rounded-md cursor-not-allowed">
+                                                Sold Out
+                                            </button>
+                                        </t>
+                                        <t t-else="">
+                                            <button type="button" t-att-data-event-id="event.id" t-att-data-event-name="event.name" onclick="event.stopPropagation(); openEventDetailModal(this.getAttribute('data-event-id'));" t-attf-class="w-full py-1.5 text-xs font-semibold rounded-md shadow-xs transition cursor-pointer #{'bg-[#1463D8] hover:bg-[#1052B5] text-white' if event.sequence % 2 != 0 else 'bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8]'}">
+                                                <t t-if="event.is_free">Register</t>
+                                                <t t-else="">Get Tickets</t>
+                                            </button>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                        
+                        <!-- Carousel Nav Right -->
+                        <button aria-label="Next Events" class="absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-[#DCE6F2] shadow-md text-slate-600 hover:text-[#1463D8] flex items-center justify-center z-10 transition opacity-90 hover:opacity-100 hover:scale-105 cursor-pointer" id="eventScrollRight">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- SECTION: Featured Merchandise (Independent Horizontal Scroll Container) -->
+                <section id="merch-section">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-lg font-bold text-[#102A4C] tracking-tight">Featured Merchandise</h2>
+                            <span class="text-xs text-slate-400 hidden sm:inline">• Official campus collection</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="hidden sm:flex items-center gap-1.5">
+                                <button aria-label="Previous Merchandise" class="w-7 h-7 rounded-full bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-600 flex items-center justify-center transition shadow-2xs cursor-pointer" id="merchScrollLeftHeader">
+                                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                                </button>
+                                <button aria-label="Next Merchandise" class="w-7 h-7 rounded-full bg-white border border-[#DCE6F2] hover:border-[#1463D8] hover:text-[#1463D8] text-slate-600 flex items-center justify-center transition shadow-2xs cursor-pointer" id="merchScrollRightHeader">
+                                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                </button>
+                            </div>
+                            <a href="#" data-action="open-all-merch" class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1 cursor-pointer">
+                                View All Merchandise <i class="fa-solid fa-arrow-right text-[10px] pointer-events-none"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="relative group/merch">
+                        <!-- Carousel Nav Left -->
+                        <button aria-label="Previous Merchandise" class="absolute -left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white border border-[#DCE6F2] shadow-md text-[#102A4C] hover:text-[#1463D8] hover:bg-slate-50 flex items-center justify-center z-10 transition opacity-95 hover:opacity-100 hover:scale-105 cursor-pointer" id="merchScrollLeft">
+                            <i class="fa-solid fa-chevron-left text-sm"></i>
+                        </button>
+                        
+                        <!-- Merch Cards Wrapper (Horizontal Landscape Cards Container) -->
+                        <div class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-1.5 px-0.5" id="merchContainer">
+                            <t t-foreach="merch_items" t-as="item">
+                                <div class="merch-card w-[340px] sm:w-[360px] h-[175px] shrink-0 bg-white border border-[#DCE6F2] rounded-xl p-3 shadow-xs hover:shadow-md transition flex items-center gap-3">
+                                    <!-- Left: Large Image Area (~44%) -->
+                                    <div class="w-[44%] h-full bg-[#F8FAFC] border border-slate-100 rounded-lg flex items-center justify-center p-1.5 overflow-hidden shrink-0">
+                                        <img t-att-src="item.image_url" t-att-alt="item.name" class="w-full h-full object-contain rounded"/>
+                                    </div>
+                                    
+                                    <!-- Right: Product Information (~56%) -->
+                                    <div class="w-[56%] h-full flex flex-col justify-between py-0.5">
+                                        <div>
+                                            <h3 class="font-bold text-sm sm:text-base text-[#102A4C] leading-snug line-clamp-1" t-att-title="item.name">
+                                                <t t-esc="item.name"/>
+                                            </h3>
+                                            <div class="text-base sm:text-lg font-extrabold text-[#102A4C] mt-0.5">
+                                                ₹<t t-esc="int(item.price)"/>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="space-y-1.5 mt-auto">
+                                            <select t-att-id="'sizeSelect_' + str(item.id)" class="w-full text-xs py-1 px-2 rounded-md border border-[#DCE6F2] bg-white text-slate-700 focus:ring-1 focus:ring-[#1463D8] focus:border-[#1463D8]">
+                                                <t t-foreach="item.get_variant_list()" t-as="variant">
+                                                    <option t-att-value="variant"><t t-esc="variant"/></option>
+                                                </t>
+                                            </select>
+                                            <t t-if="item.stock_qty &gt; 0">
+                                                <button t-att-data-product-id="item.id" t-att-data-product-name="item.name" onclick="addToCart(this);" class="w-full h-10 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer active:scale-95 flex items-center justify-center">
+                                                    Add to Cart
+                                                </button>
+                                            </t>
+                                            <t t-else="">
+                                                <button disabled="disabled" class="w-full h-10 bg-slate-200 text-slate-400 text-xs font-semibold rounded-lg cursor-not-allowed flex items-center justify-center">
+                                                    Out of Stock
+                                                </button>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                        
+                        <!-- Carousel Nav Right -->
+                        <button aria-label="Next Merchandise" class="absolute -right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white border border-[#DCE6F2] shadow-md text-[#102A4C] hover:text-[#1463D8] hover:bg-slate-50 flex items-center justify-center z-10 transition opacity-95 hover:opacity-100 hover:scale-105 cursor-pointer" id="merchScrollRight">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- SECTION: About Skyline -->
+                <section id="about-section" class="bg-white border border-[#DCE6F2] rounded-xl p-6 shadow-sm">
+                    <div class="flex flex-col lg:flex-row items-center gap-6">
+                        <!-- Left Side Content (~58%) -->
+                        <div class="w-full lg:w-[58%] flex flex-col items-start">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-[#1463D8] mb-1">About Skyline</span>
+                            <h2 class="text-xl sm:text-2xl font-bold text-[#102A4C] leading-snug">About Skyline Student Association</h2>
+                            <div class="w-10 h-0.5 bg-[#1463D8] rounded-full my-2.5"></div>
+                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                                Skyline Student Association is a student-run community dedicated to creating meaningful experiences beyond the classroom. We organize events, manage membership programs, offer official merchandise, and create opportunities for students to connect, contribute, and grow.
+                            </p>
+                            <a href="#" onclick="alert('Skyline Student Association is founded to empower students with holistic campus life, leadership opportunities, and community fellowship.'); return false;" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-medium rounded-lg shadow-sm transition cursor-pointer">
+                                Learn More <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </a>
+                        </div>
+                        <!-- Right Side 2x2 Feature Grid (~42%) -->
+                        <div class="w-full lg:w-[42%] grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <!-- Card 1: Events -->
+                            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1463D8] flex items-center justify-center shrink-0 text-xs">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="text-xs font-semibold text-[#102A4C] truncate">Events</h3>
+                                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Engaging events throughout the year</p>
+                                </div>
+                            </div>
+                            <!-- Card 2: Merchandise -->
+                            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1463D8] flex items-center justify-center shrink-0 text-xs">
+                                    <i class="fa-solid fa-bag-shopping"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="text-xs font-semibold text-[#102A4C] truncate">Merchandise</h3>
+                                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Official Skyline merch for students</p>
+                                </div>
+                            </div>
+                            <!-- Card 3: Community -->
+                            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1463D8] flex items-center justify-center shrink-0 text-xs">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="text-xs font-semibold text-[#102A4C] truncate">Community</h3>
+                                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Connect, create and belong</p>
+                                </div>
+                            </div>
+                            <!-- Card 4: Opportunities -->
+                            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-start gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1463D8] flex items-center justify-center shrink-0 text-xs">
+                                    <i class="fa-solid fa-crown"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="text-xs font-semibold text-[#102A4C] truncate">Opportunities</h3>
+                                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">Volunteer, lead and grow</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- RIGHT COLUMN: Collapsible Sidebar (25% default width, collapses smoothly to 0 with independent vertical scroll) -->
+            <aside class="w-full lg:w-[25%] shrink-0 space-y-6 transition-all duration-300" id="sidebar-col">
+                <!-- Sidebar Header / Quick Action Panel -->
+                <div class="bg-gradient-to-r from-blue-50/70 to-indigo-50/50 border border-[#DCE6F2] rounded-xl p-3 flex items-center justify-between shadow-2xs">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-md bg-[#1463D8] text-white flex items-center justify-center text-[10px]">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <span class="text-xs font-bold text-[#102A4C]">Personal Desk</span>
+                    </div>
+                    <button class="text-slate-400 hover:text-[#102A4C] text-xs p-1 rounded transition cursor-pointer" id="sidebarCollapseHeaderBtn" title="Hide Sidebar">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- CARD 1: Announcements -->
+                <div id="announcements-section" class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs">
+                    <div class="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
+                        <h2 class="text-sm font-bold text-[#102A4C]">Announcements</h2>
+                        <a class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1 cursor-pointer" href="#" data-action="open-all-announcements" onclick="openAllAnnouncementsModal(); return false;">
+                            View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+                        <t t-if="not preview_announcements">
+                            <div class="text-center py-4 text-xs text-slate-400">
+                                <i class="fa-solid fa-bullhorn text-xl mb-1 block text-slate-300"></i>
+                                No new announcements.
+                            </div>
+                        </t>
+                        <t t-foreach="preview_announcements" t-as="item">
+                            <div class="py-3 flex items-start gap-3">
+                                <div t-attf-class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 text-xs #{'bg-rose-50 text-rose-500' if item.color == 'rose' else ('bg-red-50 text-red-500' if item.color == 'red' else ('bg-blue-50 text-blue-500' if item.color == 'blue' else 'bg-amber-50 text-amber-500'))}">
+                                    <i t-attf-class="fa-solid fa-#{item.icon}"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-xs font-bold text-[#102A4C] hover:text-[#1463D8] cursor-pointer transition truncate"><t t-esc="item.title"/></h3>
+                                    <span class="block text-[10px] text-slate-400 mt-0.5"><t t-esc="item.date_display"/></span>
+                                    <p class="text-[11px] text-slate-500 mt-1 leading-snug"><t t-esc="item.description"/></p>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- CARD 2: My Tickets -->
+                <div id="tickets-section" class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs">
+                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+                        <h2 class="text-sm font-bold text-[#102A4C]">My Tickets</h2>
+                        <a class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1 cursor-pointer" href="#" data-action="open-my-tickets" onclick="openMyTicketsModal(); return false;">
+                            View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+                    <div id="myTicketsList" class="space-y-3">
+                        <t t-if="not preview_tickets">
+                            <div class="text-center py-4 text-xs text-slate-400">
+                                <i class="fa-solid fa-ticket text-xl mb-1 block text-slate-300"></i>
+                                You don't have any upcoming tickets.
+                            </div>
+                        </t>
+                        <t t-foreach="preview_tickets" t-as="ticket">
+                            <div t-att-id="'ticketItem_' + str(ticket.id)" class="p-2.5 rounded-lg border border-[#DCE6F2] hover:border-slate-300 transition">
+                                <div class="flex gap-2.5">
+                                    <img t-att-src="ticket.event_image or '/skyline_association/static/src/img/thumb_spring_gala.png'" t-att-alt="ticket.event_name" class="w-14 h-14 rounded-md object-cover shrink-0"/>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-start justify-between gap-1">
+                                            <h3 class="text-xs font-bold text-[#102A4C] truncate"><t t-esc="ticket.event_name"/></h3>
+                                            <span t-att-id="'ticketBadge_' + str(ticket.id)" t-attf-class="text-[10px] font-semibold px-1.5 py-0.2 rounded border #{'bg-emerald-50 text-emerald-600 border-emerald-200' if ticket.status in ('confirmed', 'checked_in') else 'bg-slate-100 text-slate-500'}">
+                                                <t t-if="ticket.status == 'checked_in'">Checked In</t>
+                                                <t t-else="">Confirmed</t>
+                                            </span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 mt-1 space-y-0.5">
+                                            <div class="flex items-center gap-1 truncate"><i class="fa-regular fa-calendar text-[9px]"></i> <t t-esc="ticket.event_date"/>, <t t-esc="ticket.event_time"/></div>
+                                            <div class="flex items-center gap-1 truncate"><i class="fa-solid fa-location-dot text-[9px]"></i> <t t-esc="ticket.event_location"/></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button t-att-data-ticket-id="ticket.id" t-att-data-ticket-name="ticket.name" t-att-data-event-name="ticket.event_name" t-att-data-event-date="ticket.event_date" t-att-data-event-time="ticket.event_time" t-att-data-event-loc="ticket.event_location" t-att-data-status="ticket.status" t-att-data-price="ticket.price_paid" t-att-data-qr="ticket.qr_code_token" onclick="openTicketModal(this);" class="mt-2.5 w-full py-1 text-xs font-medium text-[#1463D8] bg-blue-50/60 hover:bg-blue-100 rounded flex items-center justify-center gap-1 transition cursor-pointer">
+                                    <i class="fa-solid fa-ticket text-[10px]"></i> View Ticket
+                                </button>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- CARD 3: My Orders -->
+                <div id="orders-section" class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs">
+                    <div class="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
+                        <h2 class="text-sm font-bold text-[#102A4C]">My Orders</h2>
+                        <a class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1 cursor-pointer" href="#" data-action="open-my-orders" onclick="openMyOrdersModal('cart'); return false;">
+                            View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+                    <div id="myOrdersList" class="divide-y divide-slate-100">
+                        <t t-if="not preview_orders">
+                            <div class="text-center py-4 text-xs text-slate-400">
+                                <i class="fa-solid fa-bag-shopping text-xl mb-1 block text-slate-300"></i>
+                                No orders yet.
+                            </div>
+                        </t>
+                        <t t-foreach="preview_orders" t-as="order">
+                            <div class="py-2.5 flex items-center justify-between gap-3 group cursor-pointer"
+                                 t-att-data-order-name="order.name"
+                                 t-att-data-prod-name="order.primary_product_name"
+                                 t-att-data-variant="order.primary_variant"
+                                 t-att-data-qty="order.primary_quantity"
+                                 t-att-data-price="int(order.amount_total)"
+                                 t-att-data-status="order.status"
+                                 onclick="openOrderModalFromCard(this);">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center p-1 shrink-0">
+                                        <img t-att-src="order.primary_thumbnail or '/skyline_association/static/src/img/merch_hoodie.png'" t-att-alt="order.primary_product_name" class="h-full object-contain"/>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xs font-bold text-[#102A4C] group-hover:text-[#1463D8] transition"><t t-esc="order.primary_product_name"/></h3>
+                                        <span class="block text-[10px] text-slate-400"><t t-esc="order.primary_variant"/> | Qty: <t t-esc="order.primary_quantity"/></span>
+                                        <span class="text-xs font-bold text-[#102A4C] block mt-0.5">₹<t t-esc="int(order.amount_total)"/></span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span t-attf-class="text-[10px] font-semibold px-2 py-0.5 rounded border #{'bg-emerald-50 text-emerald-600 border-emerald-100' if order.status == 'delivered' else 'bg-blue-50 text-[#1463D8] border border-blue-100'}">
+                                        <t t-esc="order.status.capitalize()"/>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:text-slate-500"></i>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </aside>
+        </div>
+        <!-- END: ContentSplitGrid -->
+
+        </main>
+        <!-- END: PageContent -->
+
+        <!-- Floating Re-open Button (Visible when sidebar collapsed) -->
+        <div class="fixed right-0 top-1/2 -translate-y-1/2 z-40 hidden" id="reopenSidebarContainer">
+            <button class="flex items-center gap-2 bg-[#1463D8] hover:bg-[#1052B5] text-white py-2.5 px-3 rounded-l-xl shadow-xl transition transform active:scale-95 cursor-pointer" id="reopenSidebarBtn" title="Show Personal Dashboard">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+                <span class="text-xs font-semibold writing-mode-vertical sm:writing-mode-horizontal tracking-wide">Personal Sidebar</span>
+            </button>
+        </div>
+
+        <!-- BEGIN: MinimalFooter -->
+        <footer class="mt-12 border-t border-[#DCE6F2] bg-white py-6">
+        <div class="max-w-[1440px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <div class="flex items-center gap-2">
+                <img src="/skyline_association/static/src/img/logo_footer.png" alt="Skyline" class="h-6 w-auto object-contain inline-block"/>
+                <span class="font-semibold text-slate-700">Skyline Student Association</span>
+                <span>• © 2024 All Rights Reserved</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a class="hover:text-[#1463D8]" href="#">Privacy Policy</a>
+                <a class="hover:text-[#1463D8]" href="#">Terms of Service</a>
+                <a class="hover:text-[#1463D8]" href="#">Contact Support</a>
+            </div>
+        </div>
+        </footer>
+        <!-- END: MinimalFooter -->
+
+        <!-- MODAL: Ticket Details & QR Check-In Pass -->
+        <div id="ticketModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl animate-slide-down border border-[#DCE6F2]">
+                <div class="bg-gradient-to-r from-[#102A4C] to-[#1463D8] text-white p-5 relative">
+                    <button onclick="closeTicketModal();" class="absolute top-4 right-4 text-white/70 hover:text-white text-base cursor-pointer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-blue-200">Skyline Event Pass</span>
+                    <h3 id="modalEventName" class="text-lg font-bold mt-1">Spring Gala</h3>
+                    <p id="modalTicketRef" class="text-xs text-blue-100 font-mono mt-0.5">SKY-TKT-0001</p>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100 text-xs">
+                        <span class="text-slate-400">Attendee</span>
+                        <span class="font-bold text-[#102A4C]"><t t-esc="partner.name if partner else 'Aarav Patel'"/></span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100 text-xs">
+                        <span class="text-slate-400">Date &amp; Time</span>
+                        <span id="modalEventDateTime" class="font-semibold text-slate-700">15 Nov 2024, 6:00 PM</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100 text-xs">
+                        <span class="text-slate-400">Location</span>
+                        <span id="modalEventLocation" class="font-semibold text-slate-700">Main Auditorium</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100 text-xs">
+                        <span class="text-slate-400">Status</span>
+                        <span id="modalTicketStatusBadge" class="bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-2 py-0.5 rounded border border-emerald-200">Confirmed</span>
+                    </div>
+
+                    <!-- QR Mockup & Verification Code -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                        <div class="w-32 h-32 bg-white p-2 border border-slate-200 rounded-lg flex items-center justify-center shadow-xs">
+                            <i class="fa-solid fa-qrcode text-6xl text-[#102A4C]"></i>
+                        </div>
+                        <span id="modalQrToken" class="text-[10px] font-mono text-slate-400 mt-2">SKYLINE-EVT-01-TKT-001</span>
+                    </div>
+
+                    <!-- Check-in Action Button -->
+                    <button id="modalCheckinBtn" onclick="confirmCheckinFromModal();" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-check"></i> Check In Attendee Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Premium Skyline Plus Membership -->
+        <div id="membershipModal" class="hidden fixed inset-0 bg-[#0B1E36]/60 backdrop-blur-xs items-center justify-center p-3 sm:p-5" style="z-index: 9999;" onclick="if(event.target === this) closeMembershipModal();">
+            <div class="bg-white rounded-2xl w-[94%] max-w-[880px] max-h-[90vh] flex flex-col shadow-2xl border border-[#DCE6F2] overflow-hidden animate-slide-down relative">
+                
+                <!-- VIEW 1: NON-MEMBER BENEFITS & PLAN VIEW -->
+                <div id="membershipMainView" class="flex flex-col flex-1 overflow-hidden">
+                    <!-- Modal Header -->
+                    <div class="px-6 sm:px-8 pt-5 pb-4 border-b border-[#EDF3FA] flex items-start justify-between shrink-0 bg-white">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 rounded-full bg-blue-50 text-[#1463D8] text-[10px] font-bold uppercase tracking-wider border border-blue-200/60">
+                                    Official Membership
+                                </span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-black text-[#102A4C] tracking-tight">
+                                Skyline <span class="text-[#1463D8]">Plus</span> Membership
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-xl">
+                                Join Skyline Student Association and unlock exclusive member benefits, ticket discounts, and student privileges.
+                            </p>
+                        </div>
+                        <button type="button" onclick="closeMembershipModal();" aria-label="Close" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition cursor-pointer shrink-0 ml-4">
+                            <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal Body (Scrollable) -->
+                    <div class="p-5 sm:p-7 overflow-y-auto flex-1 space-y-5 bg-[#F8FAFC]">
+                        <!-- 1. Membership Plan Card -->
+                        <div class="bg-gradient-to-br from-[#F0F6FD] via-white to-[#EEF5FE] border border-[#CDE0F8] rounded-2xl p-4 sm:p-5 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#DCE6F2]/80">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1463D8] to-[#1052B5] text-amber-300 flex items-center justify-center text-xl shadow-md shadow-blue-500/20 shrink-0">
+                                        <i class="fa-solid fa-crown"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="text-lg sm:text-xl font-black text-[#102A4C]">Skyline Plus</h3>
+                                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-100 text-[#1463D8]">Annual</span>
+                                        </div>
+                                        <p class="text-xs font-medium text-slate-500 mt-0.5">Official Student Membership</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Price Section -->
+                                <div class="sm:text-right">
+                                    <div class="flex items-baseline sm:justify-end gap-1.5">
+                                        <span class="text-2xl sm:text-3xl font-black text-[#102A4C]">₹1,000</span>
+                                        <span class="text-xs sm:text-sm font-semibold text-slate-500">per year</span>
+                                    </div>
+                                    <p class="text-[11px] text-emerald-600 font-semibold mt-0.5 flex items-center sm:justify-end gap-1">
+                                        <i class="fa-solid fa-circle-check text-[10px]"></i> One-time annual payment
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 3 Compact Information Blocks -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-3.5">
+                                <div class="bg-white/90 rounded-xl p-3 border border-[#E2EEFC] flex items-center gap-3 shadow-2xs">
+                                    <div class="w-9 h-9 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm">
+                                        <i class="fa-regular fa-calendar-check"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Duration</span>
+                                        <span class="text-xs font-bold text-[#102A4C]">1 Year</span>
+                                        <span class="text-[10px] text-slate-500 block leading-tight">One-time annual payment</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white/90 rounded-xl p-3 border border-[#E2EEFC] flex items-center gap-3 shadow-2xs">
+                                    <div class="w-9 h-9 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm">
+                                        <i class="fa-solid fa-graduation-cap"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Eligibility</span>
+                                        <span class="text-xs font-bold text-[#102A4C]">Eligible Students</span>
+                                        <span class="text-[10px] text-slate-500 block leading-tight">Skyline student status</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white/90 rounded-xl p-3 border border-[#E2EEFC] flex items-center gap-3 shadow-2xs">
+                                    <div class="w-9 h-9 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm">
+                                        <i class="fa-regular fa-credit-card"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Pricing Tier</span>
+                                        <span class="text-xs font-bold text-[#102A4C]">Single Tier</span>
+                                        <span class="text-[10px] text-slate-500 block leading-tight">No monthly/quarterly fees</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. What You Get (Section 3 Benefits) -->
+                        <div>
+                            <div class="mb-2.5">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-[#1463D8]">What You Get</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">Exclusive perks and benefits unlocked with Skyline Plus</p>
+                            </div>
+
+                            <!-- 6 Benefit Cards -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                                <!-- Card 1: 20% off event tickets -->
+                                <div class="bg-white border border-[#DCE6F2] rounded-xl p-3.5 flex items-start gap-3 shadow-2xs hover:border-[#1463D8]/40 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm mt-0.5">
+                                        <i class="fa-solid fa-ticket"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-1.5">
+                                            <h5 class="text-xs font-bold text-[#102A4C]">20% Off Eligible Event Tickets</h5>
+                                            <span class="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold">20% OFF</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 leading-snug mt-0.5">Save 20% on all eligible student events and celebrations.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Card 2: Merchandise benefits -->
+                                <div class="bg-white border border-[#DCE6F2] rounded-xl p-3.5 flex items-start gap-3 shadow-2xs hover:border-[#1463D8]/40 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm mt-0.5">
+                                        <i class="fa-solid fa-bag-shopping"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-[#102A4C]">Eligible Merchandise Benefits</h5>
+                                        <p class="text-[11px] text-slate-500 leading-snug mt-0.5">Special pricing and exclusive access on configured Skyline apparel and gear.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Card 3: Priority access -->
+                                <div class="bg-white border border-[#DCE6F2] rounded-xl p-3.5 flex items-start gap-3 shadow-2xs hover:border-[#1463D8]/40 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm mt-0.5">
+                                        <i class="fa-solid fa-crown text-amber-500"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-[#102A4C]">Priority Access to Selected Events</h5>
+                                        <p class="text-[11px] text-slate-500 leading-snug mt-0.5">Early registration windows before tickets open to general campus.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Card 4: Community -->
+                                <div class="bg-white border border-[#DCE6F2] rounded-xl p-3.5 flex items-start gap-3 shadow-2xs hover:border-[#1463D8]/40 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm mt-0.5">
+                                        <i class="fa-solid fa-users"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-[#102A4C]">Community Participation</h5>
+                                        <p class="text-[11px] text-slate-500 leading-snug mt-0.5">Connect, network, and collaborate with student clubs and leadership.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Card 5: Workshops -->
+                                <div class="bg-white border border-[#DCE6F2] rounded-xl p-3.5 flex items-start gap-3 shadow-2xs hover:border-[#1463D8]/40 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm mt-0.5">
+                                        <i class="fa-solid fa-book-open"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-[#102A4C]">Workshops and Opportunities</h5>
+                                        <p class="text-[11px] text-slate-500 leading-snug mt-0.5">Skill-building sessions, career masterclasses, and guest speaker events.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Card 6: Association benefits -->
+                                <div class="bg-white border border-[#DCE6F2] rounded-xl p-3.5 flex items-start gap-3 shadow-2xs hover:border-[#1463D8]/40 transition">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#1463D8] flex items-center justify-center shrink-0 text-sm mt-0.5">
+                                        <i class="fa-solid fa-landmark"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-[#102A4C]">Association Benefits</h5>
+                                        <p class="text-[11px] text-slate-500 leading-snug mt-0.5">Official association voting representation and annual general assembly participation.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Information Note -->
+                        <div class="flex items-center gap-2 text-[11px] text-slate-500 bg-white border border-[#E2EEFC] rounded-xl px-3.5 py-2.5">
+                            <i class="fa-solid fa-circle-info text-[#1463D8] text-xs"></i>
+                            <span>Skyline Plus is an annual student association membership valid for 1 full year from purchase date.</span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="px-6 sm:px-8 py-4 border-t border-[#EDF3FA] bg-white flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                        <div class="text-xs text-slate-500 text-center sm:text-left">
+                            <span class="font-bold text-[#102A4C]">₹1,000 / year</span> · One-time annual payment
+                        </div>
+                        <button type="button" id="btnGoToCheckout" onclick="goToMembershipCheckout();" class="w-full sm:w-auto px-6 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-blue-500/20 inline-flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer">
+                            <span>Buy Membership — ₹1,000</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: CHECKOUT & PAYMENT SELECTION VIEW -->
+                <div id="membershipCheckoutView" class="hidden flex-col flex-1 overflow-hidden">
+                    <!-- Modal Header -->
+                    <div class="px-6 sm:px-8 pt-5 pb-4 border-b border-[#EDF3FA] flex items-start justify-between shrink-0 bg-white">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
+                                    Secure Odoo Checkout
+                                </span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-black text-[#102A4C] tracking-tight">
+                                Complete Membership Purchase
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                                Review your order summary and choose your preferred payment method.
+                            </p>
+                        </div>
+                        <button type="button" onclick="closeMembershipModal();" aria-label="Close" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition cursor-pointer shrink-0 ml-4">
+                            <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal Body (Scrollable) -->
+                    <div class="p-5 sm:p-7 overflow-y-auto flex-1 space-y-5 bg-[#F8FAFC]">
+                        <!-- Order & Student Information Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Plan Order Summary Card -->
+                            <div class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-2xs space-y-3">
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Order Summary</span>
+                                    <span class="text-[10px] font-bold text-[#1463D8] bg-blue-50 px-2 py-0.5 rounded-full">Annual Plan</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-600 font-medium">Skyline Plus Membership</span>
+                                    <span class="font-bold text-[#102A4C]">₹1,000</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-600">Validity Period</span>
+                                    <span class="font-semibold text-slate-700">1 Year (365 Days)</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-600">Student Platform Fee</span>
+                                    <span class="font-semibold text-emerald-600">FREE (Waived)</span>
+                                </div>
+                                <div class="pt-2 border-t border-slate-200 flex justify-between items-baseline">
+                                    <span class="text-xs font-bold text-[#102A4C]">Total Payable:</span>
+                                    <span class="text-xl font-black text-[#1463D8]">₹1,000</span>
+                                </div>
+                            </div>
+
+                            <!-- Student Billing Details -->
+                            <div class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-2xs space-y-3">
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Student Identity</span>
+                                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Verified</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-500">Student Name:</span>
+                                    <span class="font-bold text-[#102A4C]"><t t-esc="partner.name if partner else 'Aarav Patel'"/></span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-500">Email:</span>
+                                    <span class="font-semibold text-slate-700"><t t-esc="partner.email if partner else 'aarav.patel@skyline.edu'"/></span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-500">Institution:</span>
+                                    <span class="font-semibold text-slate-700">Skyline Student Association</span>
+                                </div>
+                                <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-id-card text-[#1463D8]"></i>
+                                    <span>Active student profile will be credited instantly upon confirmation.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Selection -->
+                        <div class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-2xs space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block pb-1 border-b border-slate-100">
+                                Select Payment Method
+                            </span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1" id="membershipPaymentMethods">
+                                <!-- Option 1: UPI -->
+                                <label class="flex items-center gap-3 p-3 border-2 border-[#1463D8] bg-blue-50/50 rounded-xl cursor-pointer hover:border-[#1463D8] transition">
+                                    <input type="radio" name="membership_payment_method" value="upi" checked="checked" class="accent-[#1463D8] w-4 h-4"/>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-[#102A4C]">UPI / Instant QR</span>
+                                            <span class="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">Fastest</span>
+                                        </div>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">Google Pay, PhonePe, Paytm, BHIM</p>
+                                    </div>
+                                </label>
+
+                                <!-- Option 2: Card -->
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-slate-300 transition">
+                                    <input type="radio" name="membership_payment_method" value="card" class="accent-[#1463D8] w-4 h-4"/>
+                                    <div class="flex-1">
+                                        <span class="text-xs font-bold text-[#102A4C]">Credit / Debit Card</span>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">Visa, MasterCard, RuPay</p>
+                                    </div>
+                                </label>
+
+                                <!-- Option 3: Net Banking -->
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-slate-300 transition">
+                                    <input type="radio" name="membership_payment_method" value="netbanking" class="accent-[#1463D8] w-4 h-4"/>
+                                    <div class="flex-1">
+                                        <span class="text-xs font-bold text-[#102A4C]">Net Banking</span>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">SBI, HDFC, ICICI, Axis &amp; 50+ banks</p>
+                                    </div>
+                                </label>
+
+                                <!-- Option 4: Student Campus Card -->
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:border-slate-300 transition">
+                                    <input type="radio" name="membership_payment_method" value="student_account" class="accent-[#1463D8] w-4 h-4"/>
+                                    <div class="flex-1">
+                                        <span class="text-xs font-bold text-[#102A4C]">Student Campus Card</span>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">Skyline Campus Wallet / Student Card</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Security Assurance -->
+                        <div class="flex items-center justify-between text-[11px] text-slate-500 bg-white border border-[#E2EEFC] rounded-xl px-4 py-2.5">
+                            <span class="flex items-center gap-1.5">
+                                <i class="fa-solid fa-shield-halved text-[#1463D8]"></i>
+                                <span>256-bit encrypted Odoo transaction gateway</span>
+                            </span>
+                            <span class="font-semibold text-slate-700">Official Association Payment</span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="px-6 sm:px-8 py-4 border-t border-[#EDF3FA] bg-white flex items-center justify-between gap-3 shrink-0">
+                        <button type="button" onclick="backToMembershipPlan();" class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition cursor-pointer">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Back to Plan
+                        </button>
+                        <button type="button" id="btnCompletePayment" onclick="executeMembershipPayment(this);" class="px-6 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-blue-500/20 inline-flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer">
+                            <i class="fa-solid fa-lock text-xs"></i>
+                            <span>Complete Payment — ₹1,000</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW 3: DEDICATED ACTIVE MEMBER VIEW (Section 12) -->
+                <div id="membershipActiveView" class="hidden flex-col flex-1 overflow-hidden">
+                    <!-- Modal Header -->
+                    <div class="px-6 sm:px-8 pt-5 pb-4 border-b border-[#EDF3FA] flex items-start justify-between shrink-0 bg-white">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-200 flex items-center gap-1">
+                                    <i class="fa-solid fa-check text-[10px]"></i> ACTIVE MEMBER
+                                </span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-black text-[#102A4C] tracking-tight">
+                                Skyline <span class="text-[#1463D8]">Plus</span> Membership
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                                You are an active Skyline Plus member with all student benefits unlocked.
+                            </p>
+                        </div>
+                        <button type="button" onclick="closeMembershipModal();" aria-label="Close" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition cursor-pointer shrink-0 ml-4">
+                            <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal Body (Scrollable) -->
+                    <div class="p-5 sm:p-7 overflow-y-auto flex-1 space-y-5 bg-[#F8FAFC]">
+                        <!-- Active Membership Card -->
+                        <div class="bg-gradient-to-br from-emerald-50/50 via-white to-blue-50/40 border border-emerald-200 rounded-2xl p-5 shadow-sm space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-emerald-100">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center text-xl shadow-md shadow-emerald-500/20 shrink-0">
+                                        <i class="fa-solid fa-crown"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="text-lg sm:text-xl font-black text-[#102A4C]">Skyline Plus</h3>
+                                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Active</span>
+                                        </div>
+                                        <p class="text-xs font-semibold text-emerald-700 mt-0.5">Membership active</p>
+                                    </div>
+                                </div>
+                                <div class="sm:text-right">
+                                    <div class="text-lg sm:text-xl font-black text-[#102A4C]">₹1,000 / year</div>
+                                    <div class="text-xs font-bold text-slate-600 mt-0.5">
+                                        Valid until: <span id="activeModalExpiry" class="text-emerald-700 font-extrabold"><t t-esc="membership_expiry_long or membership_expiry"/></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- YOUR BENEFITS -->
+                            <div class="pt-1">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-[#1463D8] mb-3">YOUR BENEFITS</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    <div class="bg-white border border-[#DCE6F2] rounded-xl p-3 flex items-center gap-2.5 shadow-2xs">
+                                        <span class="text-base">🎟</span>
+                                        <div>
+                                            <span class="text-xs font-bold text-[#102A4C] block">20% off eligible events</span>
+                                            <span class="text-[10px] text-slate-500">Applied automatically at checkout</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white border border-[#DCE6F2] rounded-xl p-3 flex items-center gap-2.5 shadow-2xs">
+                                        <span class="text-base">👥</span>
+                                        <div>
+                                            <span class="text-xs font-bold text-[#102A4C] block">Skyline community</span>
+                                            <span class="text-[10px] text-slate-500">Official student forum &amp; clubs</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white border border-[#DCE6F2] rounded-xl p-3 flex items-center gap-2.5 shadow-2xs">
+                                        <span class="text-base">📚</span>
+                                        <div>
+                                            <span class="text-xs font-bold text-[#102A4C] block">Workshops &amp; opportunities</span>
+                                            <span class="text-[10px] text-slate-500">Exclusive skill-building sessions</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white border border-[#DCE6F2] rounded-xl p-3 flex items-center gap-2.5 shadow-2xs">
+                                        <span class="text-base">👑</span>
+                                        <div>
+                                            <span class="text-xs font-bold text-[#102A4C] block">Priority access to selected events</span>
+                                            <span class="text-[10px] text-slate-500">Early booking &amp; reserved seats</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Help / Renewal notice -->
+                        <div class="flex items-center gap-2 text-[11px] text-slate-500 bg-white border border-[#E2EEFC] rounded-xl px-3.5 py-2.5">
+                            <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
+                            <span>Your membership privileges are actively tied to your student account and will renew annually.</span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer (No buy button) -->
+                    <div class="px-6 sm:px-8 py-4 border-t border-[#EDF3FA] bg-white flex items-center justify-end shrink-0">
+                        <button type="button" onclick="closeMembershipModal();" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                            Close
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW 4: SUCCESS VIEW (Appears after successful real purchase) -->
+                <div id="membershipSuccessView" class="hidden p-6 sm:p-10 flex-col items-center text-center space-y-5 animate-fade-in my-auto">
+                    <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl shadow-sm">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-black text-[#102A4C]">Welcome to Skyline Plus!</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Your annual membership is now active.</p>
+                    </div>
+                    
+                    <div class="w-full max-w-sm bg-[#F7FAFE] border border-[#DCE6F2] rounded-xl p-4 text-xs space-y-2 text-left">
+                        <div class="flex justify-between py-1 border-b border-slate-100">
+                            <span class="text-slate-500">Membership:</span>
+                            <span class="font-bold text-[#102A4C]" id="successPlanName">Skyline Plus</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-100">
+                            <span class="text-slate-500">Membership ID:</span>
+                            <span class="font-mono font-bold text-[#1463D8]" id="successMembershipRef">MEM-2026-0001</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-100">
+                            <span class="text-slate-500">Amount Paid:</span>
+                            <span class="font-bold text-[#102A4C]" id="successAmountPaid">₹1,000</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-100">
+                            <span class="text-slate-500">Payment Method:</span>
+                            <span class="font-bold text-slate-700" id="successPaymentMethod">UPI / Instant QR</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="text-slate-500">Valid Until:</span>
+                            <span class="font-bold text-emerald-600" id="successValidUntil">03 October 2027</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="continueAfterMembershipSuccess();" class="px-6 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition cursor-pointer">
+                        Continue to Skyline
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MODAL: Order Details Modal -->
+        <div id="orderModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl animate-slide-down border border-[#DCE6F2]">
+                <div class="bg-[#102A4C] text-white p-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold">Order Details</h3>
+                        <p id="modalOrderRef" class="text-[10px] text-slate-300 font-mono">SKY-ORD-0001</p>
+                    </div>
+                    <button onclick="closeOrderModal();" class="text-white/70 hover:text-white text-base cursor-pointer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="p-5 space-y-3 text-xs">
+                    <div class="flex justify-between pb-2 border-b border-slate-100">
+                        <span class="text-slate-400">Item</span>
+                        <span id="modalOrderProduct" class="font-bold text-[#102A4C]">Skyline Hoodie</span>
+                    </div>
+                    <div class="flex justify-between pb-2 border-b border-slate-100">
+                        <span class="text-slate-400">Variant</span>
+                        <span id="modalOrderVariant" class="font-medium text-slate-600">Size: M</span>
+                    </div>
+                    <div class="flex justify-between pb-2 border-b border-slate-100">
+                        <span class="text-slate-400">Quantity</span>
+                        <span id="modalOrderQty" class="font-medium text-slate-600">1</span>
+                    </div>
+                    <div class="flex justify-between pb-2 border-b border-slate-100">
+                        <span class="text-slate-400">Total Price</span>
+                        <span id="modalOrderPrice" class="font-bold text-[#102A4C]">₹800</span>
+                    </div>
+                    <div class="flex justify-between pb-2 border-b border-slate-100">
+                        <span class="text-slate-400">Status</span>
+                        <span id="modalOrderStatusBadge" class="bg-blue-50 text-[#1463D8] text-[10px] font-semibold px-2 py-0.5 rounded border border-blue-100">Processing</span>
+                    </div>
+                    <button onclick="closeOrderModal();" class="w-full py-1.5 mt-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition cursor-pointer">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- MODAL 1: All Announcements -->
+        <!-- ======================================================== -->
+        <div id="allAnnouncementsModal" class="hidden fixed inset-0 bg-[#0B1E36]/60 backdrop-blur-xs items-center justify-center p-3 sm:p-6" style="z-index: 9999;">
+            <div class="bg-white rounded-2xl w-[94%] max-w-[1050px] max-h-[88vh] flex flex-col shadow-2xl border border-[#DCE6F2] overflow-hidden animate-slide-down">
+                <!-- Modal Header (Compact ~65-70px) -->
+                <div class="px-6 py-3.5 border-b border-[#DCE6F2] bg-white flex items-center justify-between shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#102A4C] tracking-tight">All Announcements</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Latest updates from Skyline Student Association</p>
+                    </div>
+                    <button type="button" data-action="close-all-announcements" onclick="closeAllAnnouncementsModal();" aria-label="Close" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body: Scrollable Announcements List -->
+                <div class="p-5 overflow-y-auto flex-1 bg-[#F7FAFE] space-y-3.5">
+                    <t t-if="not announcements">
+                        <div class="text-center py-12">
+                            <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3 text-2xl">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+                            <h4 class="text-base font-bold text-[#102A4C]">No announcements available</h4>
+                            <p class="text-xs text-slate-400 mt-1">Check back later for student association news, alerts, and notices.</p>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <t t-foreach="announcements" t-as="item">
+                            <div class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs hover:shadow-sm transition flex items-start gap-4">
+                                <div t-attf-class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm mt-0.5 #{'bg-rose-50 text-rose-500' if item.color == 'rose' else ('bg-red-50 text-red-500' if item.color == 'red' else ('bg-blue-50 text-blue-500' if item.color == 'blue' else 'bg-amber-50 text-amber-500'))}">
+                                    <i t-attf-class="fa-solid fa-#{item.icon}"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <h4 class="text-sm font-bold text-[#102A4C]"><t t-esc="item.title"/></h4>
+                                        <span class="text-xs text-slate-400 font-medium flex items-center gap-1">
+                                            <i class="fa-regular fa-clock text-[10px]"></i> <t t-esc="item.date_display"/>
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-slate-600 mt-2 leading-relaxed whitespace-pre-line"><t t-esc="item.description"/></p>
+                                    <div class="mt-3 flex items-center gap-2">
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-[#1463D8] border border-blue-100">Official Notice</span>
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">Published</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- MODAL 2: My Tickets -->
+        <!-- ======================================================== -->
+        <div id="myTicketsModal" class="hidden fixed inset-0 bg-[#0B1E36]/60 backdrop-blur-xs items-center justify-center p-3 sm:p-6" style="z-index: 9999;">
+            <div class="bg-white rounded-2xl w-[94%] max-w-[1050px] max-h-[88vh] flex flex-col shadow-2xl border border-[#DCE6F2] overflow-hidden animate-slide-down">
+                <!-- Modal Header -->
+                <div class="px-6 py-3.5 border-b border-[#DCE6F2] bg-white flex items-center justify-between shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#102A4C] tracking-tight">My Tickets</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Your event registrations and ticket bookings</p>
+                    </div>
+                    <button type="button" data-action="close-my-tickets" onclick="closeMyTicketsModal();" aria-label="Close" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body: Scrollable Grid -->
+                <div class="p-5 overflow-y-auto flex-1 bg-[#F7FAFE]" id="myTicketsModalBody">
+                    <t t-if="not tickets">
+                        <div class="text-center py-12">
+                            <div class="w-16 h-16 rounded-full bg-blue-50 text-[#1463D8] flex items-center justify-center mx-auto mb-3 text-2xl">
+                                <i class="fa-solid fa-ticket"></i>
+                            </div>
+                            <h4 class="text-base font-bold text-[#102A4C]">You don't have any event tickets yet</h4>
+                            <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Explore upcoming campus events, book your spot, and attend with your digital student pass.</p>
+                            <button onclick="closeMyTicketsModal(); openAllEventsModal();" class="mt-4 px-4 py-2 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer">
+                                Explore Events
+                            </button>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <t t-foreach="tickets" t-as="ticket">
+                                <div class="bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-start gap-3.5">
+                                            <img t-att-src="ticket.event_image or '/skyline_association/static/src/img/thumb_spring_gala.png'" t-att-alt="ticket.event_name" class="w-20 h-20 rounded-lg object-cover shrink-0 border border-slate-100"/>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-start justify-between gap-1">
+                                                    <h4 class="text-sm font-bold text-[#102A4C] truncate"><t t-esc="ticket.event_name"/></h4>
+                                                    <span t-attf-class="text-[10px] font-semibold px-2 py-0.5 rounded border shrink-0 #{'bg-blue-50 text-[#1463D8] border-blue-200' if ticket.status == 'checked_in' else ('bg-emerald-50 text-emerald-600 border-emerald-200' if ticket.status == 'confirmed' else 'bg-rose-50 text-rose-600 border-rose-200')}">
+                                                        <t t-if="ticket.status == 'checked_in'">Checked In</t>
+                                                        <t t-elif="ticket.status == 'confirmed'">Confirmed</t>
+                                                        <t t-else=""><t t-esc="ticket.status.capitalize()"/></t>
+                                                    </span>
+                                                </div>
+                                                <p class="text-[11px] font-mono text-slate-400 mt-0.5"><t t-esc="ticket.name"/></p>
+                                                <div class="mt-2 space-y-0.5 text-xs text-slate-500">
+                                                    <div class="flex items-center gap-1.5 truncate"><i class="fa-regular fa-calendar text-[10px] text-slate-400"></i> <t t-esc="ticket.event_date"/> • <t t-esc="ticket.event_time"/></div>
+                                                    <div class="flex items-center gap-1.5 truncate"><i class="fa-solid fa-location-dot text-[10px] text-slate-400"></i> <t t-esc="ticket.event_location"/></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                        <div>
+                                            <span class="text-[10px] text-slate-400 block">Price Paid</span>
+                                            <span class="text-xs font-bold text-[#102A4C]">
+                                                <t t-if="ticket.price_paid == 0">Free</t>
+                                                <t t-else="">₹<t t-esc="int(ticket.price_paid) if ticket.price_paid == int(ticket.price_paid) else ('%.2f' % ticket.price_paid)"/> <span class="text-[10px] font-normal text-slate-400" t-if="ticket.is_member_rate">(Member)</span></t>
+                                            </span>
+                                        </div>
+                                        <button t-att-data-ticket-id="ticket.id" t-att-data-ticket-name="ticket.name" t-att-data-event-name="ticket.event_name" t-att-data-event-date="ticket.event_date" t-att-data-event-time="ticket.event_time" t-att-data-event-loc="ticket.event_location" t-att-data-status="ticket.status" t-att-data-price="ticket.price_paid" t-att-data-qr="ticket.qr_code_token" onclick="openTicketModal(this);" class="px-3.5 py-1.5 text-xs font-semibold text-[#1463D8] bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg flex items-center gap-1.5 transition cursor-pointer">
+                                            <i class="fa-solid fa-qrcode text-xs"></i> View Ticket Pass
+                                        </button>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- MODAL 3: My Orders (Cart + Checkout + Order History) -->
+        <!-- ======================================================== -->
+        <div id="myOrdersModal" class="hidden fixed inset-0 bg-[#0B1E36]/60 backdrop-blur-xs items-center justify-center p-3 sm:p-6" style="z-index: 9999;">
+            <div class="bg-white rounded-2xl w-[94%] max-w-[1050px] max-h-[88vh] flex flex-col shadow-2xl border border-[#DCE6F2] overflow-hidden animate-slide-down">
+                <!-- Modal Header (Compact ~65px) -->
+                <div class="px-6 py-3.5 border-b border-[#DCE6F2] bg-white flex items-center justify-between shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#102A4C] tracking-tight">My Orders</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Manage your cart, checkout and Skyline merchandise orders</p>
+                    </div>
+                    <button type="button" data-action="close-my-orders" onclick="closeMyOrdersModal();" aria-label="Close" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                    </button>
+                </div>
+
+                <!-- Top Tab Navigation -->
+                <div class="px-6 border-b border-[#DCE6F2] bg-white flex items-center gap-6 shrink-0">
+                    <button id="tabCartBtn" onclick="switchOrdersModalTab('cart');" class="py-3 text-xs font-bold border-b-2 border-[#1463D8] text-[#1463D8] flex items-center gap-2 cursor-pointer transition">
+                        <i class="fa-solid fa-cart-shopping"></i> My Cart <span id="modalCartCountBadge" class="bg-blue-100 text-[#1463D8] text-[10px] font-bold px-1.5 py-0.2 rounded-full"><t t-esc="cart_count"/></span>
+                    </button>
+                    <button id="tabHistoryBtn" onclick="switchOrdersModalTab('history');" class="py-3 text-xs font-semibold border-b-2 border-transparent text-slate-500 hover:text-[#102A4C] flex items-center gap-2 cursor-pointer transition">
+                        <i class="fa-solid fa-box-archive"></i> Order History <span id="modalHistoryCountBadge" class="bg-slate-100 text-slate-600 text-[10px] font-bold px-1.5 py-0.2 rounded-full"><t t-esc="len(orders)"/></span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-5 overflow-y-auto flex-1 bg-[#F7FAFE]">
+                    
+                    <!-- ============================================== -->
+                    <!-- TAB PANEL 1: MY CART -->
+                    <!-- ============================================== -->
+                    <div id="panelCart" class="space-y-4">
+                        
+                        <!-- VIEW 1: Cart Items & Summary -->
+                        <div id="cartItemsView" class="space-y-4">
+                            <!-- Empty State -->
+                            <div id="cartEmptyState" t-attf-class="text-center py-12 #{'hidden' if cart_order and cart_order.line_ids else ''}">
+                                <div class="w-16 h-16 rounded-full bg-blue-50 text-[#1463D8] flex items-center justify-center mx-auto mb-3 text-2xl">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                </div>
+                                <h4 class="text-base font-bold text-[#102A4C]">Your cart is empty</h4>
+                                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Add some Skyline merchandise to your cart to get started.</p>
+                                <button onclick="closeMyOrdersModal(); openAllMerchModal();" class="mt-4 px-4 py-2 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer">
+                                    Browse Merchandise
+                                </button>
+                            </div>
+
+                            <!-- Cart Table & Summary Container -->
+                            <div id="cartTableContainer" t-attf-class="#{'hidden' if not cart_order or not cart_order.line_ids else ''}">
+                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+                                    <!-- Left Column: Items List -->
+                                    <div class="lg:col-span-2 bg-white rounded-xl border border-[#DCE6F2] overflow-hidden shadow-xs">
+                                        <div class="p-3 bg-slate-50 border-b border-slate-100 hidden sm:grid grid-cols-12 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                            <span class="col-span-6">Product</span>
+                                            <span class="col-span-3 text-center">Quantity</span>
+                                            <span class="col-span-2 text-right">Price</span>
+                                            <span class="col-span-1 text-center"></span>
+                                        </div>
+                                        <div id="cartLinesList" class="divide-y divide-slate-100">
+                                            <t t-if="cart_order and cart_order.line_ids">
+                                                <t t-foreach="cart_order.line_ids" t-as="line">
+                                                    <div t-att-id="'cartLineItem_' + str(line.id)" class="p-3.5 flex flex-col sm:grid sm:grid-cols-12 items-center gap-3">
+                                                        <!-- Product Info -->
+                                                        <div class="col-span-6 flex items-center gap-3 w-full">
+                                                            <div class="w-14 h-14 rounded-lg bg-slate-50 border border-slate-100 p-1 flex items-center justify-center shrink-0">
+                                                                <img t-att-src="line.product_id.thumbnail_url or line.product_id.image_url" t-att-alt="line.product_id.name" class="w-full h-full object-contain rounded"/>
+                                                            </div>
+                                                            <div class="min-w-0">
+                                                                <h4 class="text-xs font-bold text-[#102A4C] truncate"><t t-esc="line.product_id.name"/></h4>
+                                                                <span class="text-[11px] text-slate-400 block"><t t-esc="line.variant"/></span>
+                                                                <span class="text-xs font-bold text-[#102A4C] sm:hidden block mt-0.5">₹<t t-esc="int(line.price_unit)"/></span>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Quantity Stepper -->
+                                                        <div class="col-span-3 flex items-center justify-center gap-1.5 w-full sm:w-auto">
+                                                            <button type="button" t-att-onclick="'updateCartQty(' + str(line.id) + ', -1);'" class="w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center transition cursor-pointer">
+                                                                -
+                                                            </button>
+                                                            <span t-att-id="'cartLineQty_' + str(line.id)" class="w-8 text-center font-bold text-xs text-[#102A4C]"><t t-esc="line.quantity"/></span>
+                                                            <button type="button" t-att-onclick="'updateCartQty(' + str(line.id) + ', 1);'" class="w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center transition cursor-pointer">
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                        <!-- Price Subtotal -->
+                                                        <div class="col-span-2 text-right hidden sm:block">
+                                                            <span class="text-xs font-bold text-[#102A4C]">₹<span t-att-id="'cartLineSubtotal_' + str(line.id)"><t t-esc="int(line.price_subtotal)"/></span></span>
+                                                        </div>
+                                                        <!-- Remove Trash Button -->
+                                                        <div class="col-span-1 text-center">
+                                                            <button type="button" t-att-onclick="'removeCartItem(' + str(line.id) + ');'" class="text-slate-400 hover:text-rose-500 transition p-1.5 cursor-pointer" title="Remove Item">
+                                                                <i class="fa-solid fa-trash-can text-xs"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </t>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right Column: Cart Summary -->
+                                    <div class="bg-white rounded-xl border border-[#DCE6F2] p-4 shadow-xs space-y-3.5">
+                                        <h4 class="text-xs font-bold text-[#102A4C] uppercase tracking-wider">Cart Summary</h4>
+                                        <div class="space-y-2 text-xs border-b border-slate-100 pb-3">
+                                            <div class="flex justify-between text-slate-500">
+                                                <span>Subtotal</span>
+                                                <span class="font-bold text-[#102A4C]">₹<span id="cartSummarySubtotal"><t t-esc="int(cart_order.amount_total) if cart_order else 0"/></span></span>
+                                            </div>
+                                            <div class="flex justify-between text-slate-500">
+                                                <span>Delivery (Campus Union)</span>
+                                                <span class="font-semibold text-emerald-600">Free</span>
+                                            </div>
+                                            <div class="flex justify-between text-slate-500">
+                                                <span>Taxes</span>
+                                                <span class="font-semibold text-slate-600">₹0</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-between items-baseline pt-1">
+                                            <span class="text-sm font-bold text-[#102A4C]">Total</span>
+                                            <span class="text-lg font-extrabold text-[#1463D8]">₹<span id="cartSummaryTotal"><t t-esc="int(cart_order.amount_total) if cart_order else 0"/></span></span>
+                                        </div>
+                                        <button id="btnProceedCheckout" onclick="showCheckoutView();" class="w-full py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-bold rounded-lg shadow-sm transition cursor-pointer flex items-center justify-center gap-2">
+                                            <span>Proceed to Checkout</span>
+                                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VIEW 2: Checkout & Payment -->
+                        <div id="cartCheckoutView" class="hidden bg-white rounded-xl border border-[#DCE6F2] p-5 shadow-xs space-y-5 animate-slide-down">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <div class="flex items-center gap-2">
+                                    <button onclick="showCartItemsView();" class="text-xs font-semibold text-slate-500 hover:text-[#1463D8] flex items-center gap-1 cursor-pointer">
+                                        <i class="fa-solid fa-arrow-left text-[10px]"></i> Back to Cart
+                                    </button>
+                                    <span class="text-slate-300">•</span>
+                                    <h4 class="text-sm font-bold text-[#102A4C]">Checkout &amp; Campus Delivery</h4>
+                                </div>
+                                <span class="text-xs font-bold text-[#1463D8]">Step 2 of 2</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <!-- Delivery Pickup Location -->
+                                <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <h5 class="text-xs font-bold text-[#102A4C] uppercase tracking-wider flex items-center gap-1.5">
+                                        <i class="fa-solid fa-location-dot text-[#1463D8]"></i> Pickup Information
+                                    </h5>
+                                    <div class="text-xs space-y-1.5 text-slate-600">
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-400">Student:</span>
+                                            <span class="font-bold text-[#102A4C]"><t t-esc="partner.name if partner else 'Aarav Patel'"/></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-400">Student ID:</span>
+                                            <span class="font-mono text-slate-700"><t t-esc="partner.student_id_number if (partner and partner.student_id_number) else 'SKY-2024-8842'"/></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-400">Pickup Counter:</span>
+                                            <span class="font-medium text-[#102A4C]">Skyline Association Desk (Union Bldg A)</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-400">Ready Time:</span>
+                                            <span class="font-medium text-emerald-600">Same Day Pickup</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Method Selection -->
+                                <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <h5 class="text-xs font-bold text-[#102A4C] uppercase tracking-wider flex items-center gap-1.5">
+                                        <i class="fa-solid fa-credit-card text-[#1463D8]"></i> Select Payment Method
+                                    </h5>
+                                    <div class="space-y-2 text-xs">
+                                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-[#DCE6F2] cursor-pointer hover:border-[#1463D8] transition">
+                                            <input type="radio" name="paymentMethod" value="upi" checked="checked" class="text-[#1463D8] focus:ring-[#1463D8]"/>
+                                            <div class="flex-1">
+                                                <span class="font-bold text-[#102A4C] block">UPI Instant Payment</span>
+                                                <span class="text-[10px] text-slate-400">Google Pay, PhonePe, Paytm, BHIM</span>
+                                            </div>
+                                            <i class="fa-solid fa-mobile-screen-button text-[#1463D8] text-sm"></i>
+                                        </label>
+                                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-[#DCE6F2] cursor-pointer hover:border-[#1463D8] transition">
+                                            <input type="radio" name="paymentMethod" value="card" class="text-[#1463D8] focus:ring-[#1463D8]"/>
+                                            <div class="flex-1">
+                                                <span class="font-bold text-[#102A4C] block">Student Card / Debit Card</span>
+                                                <span class="text-[10px] text-slate-400">Visa, Mastercard, RuPay</span>
+                                            </div>
+                                            <i class="fa-solid fa-credit-card text-slate-400 text-sm"></i>
+                                        </label>
+                                        <label class="flex items-center gap-2.5 p-2 bg-white rounded-lg border border-[#DCE6F2] cursor-pointer hover:border-[#1463D8] transition">
+                                            <input type="radio" name="paymentMethod" value="cash" class="text-[#1463D8] focus:ring-[#1463D8]"/>
+                                            <div class="flex-1">
+                                                <span class="font-bold text-[#102A4C] block">Pay on Campus Pickup</span>
+                                                <span class="text-[10px] text-slate-400">Cash or UPI at association desk</span>
+                                            </div>
+                                            <i class="fa-solid fa-money-bill-wave text-emerald-600 text-sm"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+                                <div>
+                                    <span class="text-xs text-slate-500 block">Total Amount to Pay:</span>
+                                    <span class="text-xl font-extrabold text-[#102A4C]">₹<span id="checkoutAmountTotal"><t t-esc="int(cart_order.amount_total) if cart_order else 0"/></span></span>
+                                </div>
+                                <button id="btnPayConfirm" onclick="executeCartCheckout();" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition cursor-pointer flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-lock text-xs"></i>
+                                    <span>Pay &amp; Confirm Order</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- VIEW 3: Order Confirmation State -->
+                        <div id="cartConfirmationView" class="hidden bg-white rounded-xl border border-[#DCE6F2] p-8 text-center shadow-xs space-y-4 animate-slide-down">
+                            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-3xl">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Order Confirmed</span>
+                                <h4 class="text-xl font-extrabold text-[#102A4C] mt-1">Order Placed Successfully!</h4>
+                                <p class="text-sm font-mono text-[#1463D8] font-bold mt-1" id="confirmedOrderRef">SKY-ORD-0125</p>
+                                <p class="text-xs text-slate-500 mt-2 max-w-sm mx-auto">
+                                    Your Skyline merchandise order has been recorded. You can collect it from the Student Union desk.
+                                </p>
+                            </div>
+                            <div class="pt-4 flex flex-wrap items-center justify-center gap-3">
+                                <button onclick="switchOrdersModalTab('history');" class="px-5 py-2 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer">
+                                    View in Order History
+                                </button>
+                                <button onclick="closeMyOrdersModal();" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition cursor-pointer">
+                                    Continue Shopping
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- TAB PANEL 2: ORDER HISTORY -->
+                    <!-- ============================================== -->
+                    <div id="panelHistory" class="hidden space-y-4">
+                        <!-- Status Filter Pills -->
+                        <div class="flex flex-wrap items-center gap-2 pb-1 border-b border-slate-100">
+                            <button onclick="filterOrderHistory('all', this);" class="order-filter-btn px-3 py-1 bg-[#1463D8] text-white text-xs font-semibold rounded-full shadow-2xs transition cursor-pointer">
+                                All
+                            </button>
+                            <button onclick="filterOrderHistory('processing', this);" class="order-filter-btn px-3 py-1 bg-white hover:bg-slate-100 border border-[#DCE6F2] text-slate-600 text-xs font-medium rounded-full transition cursor-pointer">
+                                Order Placed
+                            </button>
+                            <button onclick="filterOrderHistory('confirmed', this);" class="order-filter-btn px-3 py-1 bg-white hover:bg-slate-100 border border-[#DCE6F2] text-slate-600 text-xs font-medium rounded-full transition cursor-pointer">
+                                Confirmed
+                            </button>
+                            <button onclick="filterOrderHistory('delivered', this);" class="order-filter-btn px-3 py-1 bg-white hover:bg-slate-100 border border-[#DCE6F2] text-slate-600 text-xs font-medium rounded-full transition cursor-pointer">
+                                Delivered
+                            </button>
+                            <button onclick="filterOrderHistory('cancelled', this);" class="order-filter-btn px-3 py-1 bg-white hover:bg-slate-100 border border-[#DCE6F2] text-slate-600 text-xs font-medium rounded-full transition cursor-pointer">
+                                Cancelled
+                            </button>
+                        </div>
+
+                        <!-- Orders List -->
+                        <div id="orderHistoryCardsList" class="space-y-3">
+                            <t t-if="not orders">
+                                <div class="text-center py-12">
+                                    <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3 text-2xl">
+                                        <i class="fa-solid fa-box-open"></i>
+                                    </div>
+                                    <h4 class="text-base font-bold text-[#102A4C]">You haven't placed any merchandise orders yet</h4>
+                                    <p class="text-xs text-slate-400 mt-1">Browse official Skyline merchandise and gear up!</p>
+                                    <button onclick="closeMyOrdersModal(); openAllMerchModal();" class="mt-4 px-4 py-2 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer">
+                                        Browse Merchandise
+                                    </button>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <t t-foreach="orders" t-as="order">
+                                    <div t-att-data-order-status="order.status" class="order-history-card bg-white border border-[#DCE6F2] rounded-xl p-4 shadow-xs hover:shadow-sm transition space-y-3">
+                                        <!-- Header row -->
+                                        <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs font-mono font-bold text-[#102A4C]"><t t-esc="order.name"/></span>
+                                                <span class="text-slate-300">•</span>
+                                                <span class="text-xs text-slate-400">
+                                                    <t t-if="order.date_order"><t t-esc="order.date_order.strftime('%d %b %Y')"/></t>
+                                                    <t t-else="">Recent</t>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span t-attf-class="text-[10px] font-semibold px-2 py-0.5 rounded border #{'bg-emerald-50 text-emerald-600 border-emerald-200' if order.status in ('confirmed', 'delivered') else ('bg-blue-50 text-[#1463D8] border-blue-200' if order.status == 'processing' else 'bg-rose-50 text-rose-600 border-rose-200')}">
+                                                    <t t-if="order.status == 'confirmed'">Order Confirmed</t>
+                                                    <t t-elif="order.status == 'processing'">Order Placed</t>
+                                                    <t t-elif="order.status == 'delivered'">Delivered / Received</t>
+                                                    <t t-elif="order.status == 'cancelled'">Cancelled</t>
+                                                    <t t-else=""><t t-esc="order.status.capitalize()"/></t>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Items List Preview -->
+                                        <div class="space-y-2">
+                                            <t t-foreach="order.line_ids" t-as="l">
+                                                <div class="flex items-center justify-between gap-3 text-xs">
+                                                    <div class="flex items-center gap-2.5">
+                                                        <div class="w-10 h-10 rounded-md bg-slate-50 border border-slate-100 p-0.5 flex items-center justify-center shrink-0">
+                                                            <img t-att-src="l.product_id.thumbnail_url or l.product_id.image_url" t-att-alt="l.product_id.name" class="w-full h-full object-contain rounded"/>
+                                                        </div>
+                                                        <div>
+                                                            <h5 class="font-bold text-[#102A4C]"><t t-esc="l.product_id.name"/></h5>
+                                                            <span class="text-[11px] text-slate-400"><t t-esc="l.variant"/> • Qty: <t t-esc="l.quantity"/></span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="font-bold text-[#102A4C]">₹<t t-esc="int(l.price_subtotal)"/></span>
+                                                </div>
+                                            </t>
+                                        </div>
+
+                                        <!-- Footer / Details Toggle -->
+                                        <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                                            <div class="text-xs">
+                                                <span class="text-slate-400">Total: </span>
+                                                <span class="font-extrabold text-[#102A4C]">₹<t t-esc="int(order.amount_total)"/></span>
+                                            </div>
+                                            <button type="button" t-att-onclick="'toggleOrderHistoryDetails(' + str(order.id) + ');'" class="text-xs font-semibold text-[#1463D8] hover:text-[#1052B5] flex items-center gap-1 cursor-pointer">
+                                                <span>View Details</span>
+                                                <i t-att-id="'orderDetailChevron_' + str(order.id)" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Expanded Details Drawer -->
+                                        <div t-att-id="'orderDetailDrawer_' + str(order.id)" class="hidden bg-slate-50 rounded-lg p-3 text-xs space-y-2 border border-slate-200/60 mt-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-slate-500">Payment Status:</span>
+                                                <span class="font-bold text-emerald-600"><t t-esc="order.payment_status.capitalize() if order.payment_status else 'Paid'"/></span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-slate-500">Delivery Method:</span>
+                                                <span class="font-medium text-[#102A4C]">Campus Pickup (Student Union Desk)</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-slate-500">Subtotal:</span>
+                                                <span class="font-medium text-slate-700">₹<t t-esc="int(order.amount_total)"/></span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-slate-500">Shipping &amp; Taxes:</span>
+                                                <span class="font-medium text-slate-700">₹0 (Free Campus Pickup)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- JSON DATA: Real Events Payload for Instant Dynamic Modal Rendering -->
+        <script id="skyline-events-data" type="application/json"><t t-raw="events_json"/></script>
+        <script>
+            window.SKYLINE_IS_MEMBER = <t t-esc="'true' if is_member else 'false'"/>;
+        </script>
+
+        <!-- MODAL: Dynamic Event Detail -->
+        <div id="eventDetailModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs items-center justify-center p-3 sm:p-6" style="z-index: 10000;" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+            <!-- Modal Container (Max Width 5xl ~ 1080px, rounded-2xl, max-h 92vh) -->
+            <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl overflow-hidden relative flex flex-col md:flex-row max-h-[92vh] animate-slide-down">
+                <!-- Top-Right Close Button -->
+                <button type="button" onclick="closeEventDetailModal();" aria-label="Close Modal" class="absolute top-4 right-4 z-30 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition flex items-center justify-center font-bold text-lg focus:outline-none cursor-pointer">
+                    <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                </button>
+
+                <!-- Left Column: Visual Poster & Media (~42% on desktop) -->
+                <div class="w-full md:w-[42%] relative bg-slate-900 shrink-0 min-h-[240px] sm:min-h-[280px] md:min-h-[500px]">
+                    <img id="eventModalImage" alt="Event Cover" class="w-full h-full object-cover object-center absolute inset-0 transition duration-300" src="/skyline_association/static/src/img/event_spring_gala.png"/>
+                    <!-- Subtle gradient overlay for photo depth -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/20 pointer-events-none"></div>
+                    <!-- Floating Badge for Event Special -->
+                    <div id="eventModalFloatingBadge" class="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-white/40 shadow-sm flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+                        <span id="eventModalFloatingBadgeText" class="text-xs font-semibold text-slate-900 tracking-wide uppercase">Annual Premiere Event</span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Event Details & Ticketing CTA (~58% on desktop) -->
+                <div class="w-full md:w-[58%] p-6 sm:p-8 flex flex-col justify-between overflow-y-auto custom-scrollbar bg-white">
+                    <!-- Header & Core Meta Section -->
+                    <div class="space-y-4">
+                        <!-- Top Tags & Favorite Action -->
+                        <div class="flex items-center justify-between gap-2 pr-8">
+                            <div class="flex items-center flex-wrap gap-2">
+                                <span id="eventModalTagBadge" class="bg-blue-50 text-[#1268F3] border border-blue-100 font-semibold px-2.5 py-1 rounded-full text-xs">
+                                    Featured Event
+                                </span>
+                                <span id="eventModalAvailabilityBadge" class="bg-emerald-50 text-emerald-700 border border-emerald-100 font-semibold px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5">
+                                    <span id="eventModalAvailabilityDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span id="eventModalAvailabilityText">Tickets Available</span>
+                                </span>
+                            </div>
+                            <!-- Save to Favorites Button -->
+                            <button type="button" aria-label="Save Event" onclick="toggleEventFavorite(this);" class="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-rose-500 transition cursor-pointer">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+                            </button>
+                        </div>
+
+                        <!-- Event Title & Subtitle -->
+                        <div>
+                            <h1 id="eventModalTitle" class="text-2xl sm:text-3xl font-extrabold text-[#0B2457] tracking-tight">
+                                Spring Gala
+                            </h1>
+                            <p id="eventModalSubtitle" class="text-slate-500 text-sm mt-1 leading-relaxed">
+                                Our biggest event of the year! Music, food, and unforgettable moments.
+                            </p>
+                        </div>
+
+                        <!-- Metadata Grid: Date, Venue, Time -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 py-3 border-y border-slate-100">
+                            <!-- Date -->
+                            <div class="flex items-start gap-2.5">
+                                <span class="p-2 rounded-lg bg-slate-50 text-[#1268F3] border border-slate-100 shrink-0">
+                                    <svg class="w-4 h-4 text-[#1268F3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                </span>
+                                <div>
+                                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Date</p>
+                                    <p id="eventModalDate" class="text-xs font-bold text-slate-800">15 Nov 2024</p>
+                                </div>
+                            </div>
+                            <!-- Time -->
+                            <div class="flex items-start gap-2.5">
+                                <span class="p-2 rounded-lg bg-slate-50 text-[#1268F3] border border-slate-100 shrink-0">
+                                    <svg class="w-4 h-4 text-[#1268F3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                </span>
+                                <div>
+                                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Time</p>
+                                    <p id="eventModalTime" class="text-xs font-bold text-slate-800">6:00 PM – 10:00 PM</p>
+                                </div>
+                            </div>
+                            <!-- Venue -->
+                            <div class="flex items-start gap-2.5">
+                                <span class="p-2 rounded-lg bg-slate-50 text-[#1268F3] border border-slate-100 shrink-0">
+                                    <svg class="w-4 h-4 text-[#1268F3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                </span>
+                                <div>
+                                    <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Venue</p>
+                                    <p id="eventModalVenue" class="text-xs font-bold text-slate-800 truncate" title="Main Auditorium">Main Auditorium</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- What to Expect Section -->
+                        <div id="eventModalExpectContainer" class="space-y-1.5">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">What to Expect</span>
+                            <div id="eventModalExpectPills" class="flex flex-wrap gap-2 pt-0.5"></div>
+                        </div>
+
+                        <!-- Description Section -->
+                        <div class="space-y-1">
+                            <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">About This Event</h2>
+                            <p id="eventModalDescription" class="text-xs sm:text-sm text-slate-600 leading-relaxed max-h-32 overflow-y-auto custom-scrollbar pr-1 whitespace-pre-line"></p>
+                        </div>
+                    </div>
+
+                    <!-- BEGIN: PricingAndCTA -->
+                    <div class="pt-5 mt-4 border-t border-slate-200 space-y-3" data-purpose="pricing-cta-container">
+                        <!-- Ticket Tier Selector (Member vs Non-Member) -->
+                        <div id="eventModalTicketSelector" class="flex flex-wrap items-center gap-2">
+                            <button type="button" id="tierMemberBtn" onclick="selectEventTicketTier('member');" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-[#1268F3] bg-blue-50/70 text-xs font-semibold text-[#0B2457] transition cursor-pointer">
+                                <span>Member Ticket — <span id="tierMemberPriceDisplay">₹360</span></span>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded font-bold">20% OFF</span>
+                            </button>
+                            <button type="button" id="tierNonMemberBtn" onclick="selectEventTicketTier('non_member');" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 bg-white text-xs font-medium text-slate-600 transition cursor-pointer">
+                                <span>Non-Member Ticket — <span id="tierNonMemberPriceDisplay">₹450</span></span>
+                            </button>
+                        </div>
+
+                        <!-- Dual Pricing Details & Primary Call To Action Button -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <!-- Dual Pricing Details -->
+                            <div class="flex items-center gap-5">
+                                <!-- Main Member Price Block -->
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <span id="eventModalPriceLabel" class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Skyline Members</span>
+                                    </div>
+                                    <div class="flex items-baseline gap-2">
+                                        <span id="eventModalMainPrice" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">₹360</span>
+                                        <span id="eventModalDiscountBadge" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                                            <svg class="w-3 h-3 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg> 20% Member Discount
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Vertical Separator -->
+                                <div id="eventModalDivider" class="h-9 w-px bg-slate-200 hidden sm:block"></div>
+                                <!-- Non-Member Price Block -->
+                                <div id="eventModalSecPriceContainer" class="space-y-1 hidden sm:block">
+                                    <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Non-Members</span>
+                                    <p id="eventModalSecPrice" class="text-lg font-semibold text-slate-400">₹450</p>
+                                </div>
+                            </div>
+                            <!-- Primary CTA Button -->
+                            <button id="eventModalActionBtn" type="button" onclick="bookTicketFromModal(this);" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1268F3] hover:bg-blue-700 text-white font-semibold text-sm px-7 py-3 rounded-xl shadow-md hover:shadow-lg transition-all focus:ring-4 focus:ring-blue-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span id="eventModalActionBtnText">Get Tickets</span>
+                                <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- END: PricingAndCTA -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: All Events -->
+        <div id="allEventsModal" class="hidden fixed inset-0 bg-[#0B1E36]/60 backdrop-blur-xs items-center justify-center p-3 sm:p-6" style="z-index: 9999;">
+            <div class="bg-white rounded-2xl w-[94%] max-w-[1180px] max-h-[88vh] flex flex-col shadow-2xl border border-[#DCE6F2] overflow-hidden animate-slide-down">
+                <!-- Modal Header (Compact ~65px) -->
+                <div class="px-6 py-3.5 border-b border-[#DCE6F2] bg-white flex items-center justify-between shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#102A4C] tracking-tight">All Events</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Discover upcoming Skyline Student Association events.</p>
+                    </div>
+                    <button type="button" data-action="close-all-events" aria-label="Close" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Content (Scrollable Grid: 4 columns on desktop) -->
+                <div class="p-5 overflow-y-auto flex-1 bg-[#F7FAFE]">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <t t-foreach="events" t-as="event">
+                            <div class="bg-white border border-[#DCE6F2] rounded-xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md transition cursor-pointer event-card-trigger group" t-att-data-event-id="event.id" onclick="openEventDetailModal(this.getAttribute('data-event-id'));">
+                                <div>
+                                    <div class="relative h-32 w-full overflow-hidden bg-slate-100">
+                                        <img t-att-src="event.image_url" t-att-alt="event.name" class="w-full h-full object-cover transition duration-300 group-hover:scale-105"/>
+                                        <!-- Date Badge -->
+                                        <div class="absolute top-2 left-2 bg-white/95 rounded-md px-2 py-0.5 text-center shadow-xs">
+                                            <span class="text-[9px] font-bold text-slate-500 uppercase block leading-tight"><t t-esc="event.month_short"/></span>
+                                            <span class="text-sm font-extrabold text-[#1463D8] leading-none"><t t-esc="event.day_num"/></span>
+                                        </div>
+                                    </div>
+                                    <div class="p-3.5 space-y-1.5">
+                                        <div class="flex items-center gap-1.5">
+                                            <h4 class="font-bold text-xs sm:text-[13px] text-[#102A4C] truncate group-hover:text-[#1463D8] transition-colors"><t t-esc="event.name"/></h4>
+                                            <t t-if="event.tag">
+                                                <span t-attf-class="text-[9px] font-bold px-1.5 py-0.5 rounded #{'bg-blue-100 text-[#1463D8]' if event.tag == 'Featured' else 'bg-emerald-100 text-emerald-700'}">
+                                                    <t t-esc="event.tag"/>
+                                                </span>
+                                            </t>
+                                        </div>
+                                        <div class="space-y-0.5 text-[11px] text-slate-500">
+                                            <div class="flex items-center gap-1.5 truncate">
+                                                <i class="fa-solid fa-location-dot text-slate-400 text-[10px]"></i>
+                                                <span><t t-esc="event.location"/></span>
+                                            </div>
+                                            <div class="flex items-center gap-1.5 truncate">
+                                                <i class="fa-regular fa-clock text-slate-400 text-[10px]"></i>
+                                                <span><t t-esc="event.time_display"/></span>
+                                            </div>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed h-[32px]">
+                                            <t t-esc="event.description"/>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="p-3.5 pt-0 mt-auto">
+                                    <div class="flex items-center justify-between mb-2 text-xs">
+                                        <div class="flex items-baseline gap-1">
+                                            <t t-if="event.is_free">
+                                                <span class="text-xs font-bold text-emerald-600 uppercase">Free</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="text-xs font-bold text-[#102A4C]">₹<t t-esc="int(event.member_price) if event.member_price == int(event.member_price) else ('%.2f' % event.member_price)"/></span>
+                                                <span class="text-[10px] text-slate-400">Member</span>
+                                                <span class="text-slate-300">|</span>
+                                                <span class="text-xs font-bold text-slate-500">₹<t t-esc="int(event.non_member_price) if event.non_member_price == int(event.non_member_price) else ('%.2f' % event.non_member_price)"/></span>
+                                            </t>
+                                        </div>
+                                        <span class="text-[10px] text-slate-400">
+                                            <t t-if="event.remaining_seats &gt; 0">
+                                                <t t-esc="event.remaining_seats"/> left
+                                            </t>
+                                        </span>
+                                    </div>
+                                    <t t-if="event.is_sold_out">
+                                        <button disabled="disabled" class="w-full py-1.5 bg-slate-200 text-slate-400 text-xs font-semibold rounded-lg cursor-not-allowed">
+                                            Sold Out
+                                        </button>
+                                    </t>
+                                    <t t-else="">
+                                        <button type="button" t-att-data-event-id="event.id" t-att-data-event-name="event.name" onclick="event.stopPropagation(); openEventDetailModal(this.getAttribute('data-event-id'));" t-attf-class="w-full py-1.5 text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer active:scale-95 #{'bg-[#1463D8] hover:bg-[#1052B5] text-white' if event.sequence % 2 != 0 else 'bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8]'}">
+                                            <t t-if="event.is_free">Register</t>
+                                            <t t-else="">Get Tickets</t>
+                                        </button>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: All Merchandise -->
+        <div id="allMerchModal" class="hidden fixed inset-0 bg-[#0B1E36]/60 backdrop-blur-xs items-center justify-center p-3 sm:p-6" style="z-index: 9999;">
+            <div class="bg-white rounded-2xl w-[94%] max-w-[1180px] max-h-[88vh] flex flex-col shadow-2xl border border-[#DCE6F2] overflow-hidden animate-slide-down">
+                <!-- Modal Header (Compact ~65px) -->
+                <div class="px-6 py-3.5 border-b border-[#DCE6F2] bg-white flex items-center justify-between shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#102A4C] tracking-tight">All Merchandise</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Explore the official Skyline Student Association collection.</p>
+                    </div>
+                    <button type="button" data-action="close-all-merch" aria-label="Close" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-solid fa-xmark text-sm pointer-events-none"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Content (Scrollable Grid: 5 columns on desktop) -->
+                <div class="p-5 overflow-y-auto flex-1 bg-[#F7FAFE]">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+                        <t t-foreach="merch_items" t-as="item">
+                            <div class="merch-card bg-white border border-[#DCE6F2] rounded-xl p-3 shadow-xs hover:shadow-md transition flex flex-col justify-between min-h-[270px]">
+                                <div>
+                                    <!-- Image area (approx 120-130px) -->
+                                    <div class="h-32 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center p-2 mb-2.5 overflow-hidden">
+                                        <img t-att-src="item.image_url" t-att-alt="item.name" class="w-full h-full object-contain rounded"/>
+                                    </div>
+                                    <div class="space-y-0.5">
+                                        <h4 class="font-bold text-xs sm:text-[13px] text-[#102A4C] truncate" t-att-title="item.name">
+                                            <t t-esc="item.name"/>
+                                        </h4>
+                                        <div class="text-sm font-extrabold text-[#102A4C]">
+                                            ₹<t t-esc="int(item.price)"/>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1 text-[11px]">
+                                        <t t-if="item.stock_qty &gt; 0">
+                                            <span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
+                                                <i class="fa-solid fa-circle text-[5px]"></i> In Stock
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="inline-flex items-center gap-1 text-rose-500 font-medium">
+                                                <i class="fa-solid fa-circle text-[5px]"></i> Out of Stock
+                                            </span>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-2.5 space-y-1.5">
+                                    <select class="w-full text-xs py-1 px-2 rounded-md border border-[#DCE6F2] bg-white text-slate-700 focus:ring-1 focus:ring-[#1463D8] focus:border-[#1463D8]">
+                                        <t t-foreach="item.get_variant_list()" t-as="variant">
+                                            <option t-att-value="variant"><t t-esc="variant"/></option>
+                                        </t>
+                                    </select>
+                                    <t t-if="item.stock_qty &gt; 0">
+                                        <button t-att-data-product-id="item.id" t-att-data-product-name="item.name" onclick="addToCart(this);" class="w-full py-1.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer active:scale-95">
+                                            Add to Cart
+                                        </button>
+                                    </t>
+                                    <t t-else="">
+                                        <button disabled="disabled" class="w-full py-1.5 bg-slate-200 text-slate-400 text-xs font-semibold rounded-lg cursor-not-allowed">
+                                            Out of Stock
+                                        </button>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Script for Collapsible Sidebar & Carousel Controls & Live Actions -->
+        <script src="/skyline_association/static/src/js/skyline_portal.js?v=20261003_v16"></script>
+        </body>
+        </html>
+    </template>
+</odoo>
