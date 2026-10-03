@@ -1,0 +1,13 @@
+import { z } from 'zod';
+export const roles = ['admin', 'volunteer'] as const;
+export const taskStatuses = ['ASSIGNED','IN_PROGRESS','COMPLETED','CANCELLED'] as const;
+export const claimStatuses = ['DRAFT','SUBMITTED','CHANGES_REQUESTED','REJECTED','APPROVED_UNPAID','PAID'] as const;
+export const loginSchema = z.object({email:z.email().max(254).transform(v=>v.toLowerCase().trim()),password:z.string().min(1).max(200),requestedPortal:z.enum(roles)}).strict();
+export const passwordSchema = z.string().min(12,'Use at least 12 characters').max(200);
+export const moneySchema = z.number().int().min(0).max(1000000000);
+export const optionalId = z.string().min(1).max(100).nullable().optional();
+export const dateTimeSchema = z.iso.datetime({offset:true}).transform(v=>new Date(v).toISOString());
+export const memberSchema = z.object({name:z.string().trim().min(2).max(120),email:z.email().max(254),phone:z.string().max(30).default(''),student_number:z.string().max(50).default(''),notes:z.string().max(2000).default(''),user_id:optionalId}).strict();
+export const eventSchema = z.object({title:z.string().trim().min(2).max(160),type:z.enum(['EVENT','FUNDRAISER']).default('EVENT'),description:z.string().max(5000).default(''),start_at:dateTimeSchema,end_at:dateTimeSchema,location:z.string().trim().min(2).max(300),capacity:z.number().int().min(1).max(100000),member_price_paise:moneySchema.default(0),nonmember_price_paise:moneySchema.default(0),budget_paise:moneySchema.default(0),volunteer_requirement:z.number().int().min(0).max(10000).default(0),status:z.enum(['DRAFT','PUBLISHED','CANCELLED']).default('DRAFT')}).strict();
+export const taskSchema = z.object({title:z.string().trim().min(2).max(200),instructions:z.string().max(5000).default(''),assignee_id:z.string().min(1).max(100),event_id:optionalId,due_at:dateTimeSchema.nullable().optional(),budget_paise:moneySchema.default(0),status:z.enum(taskStatuses).default('ASSIGNED')}).strict();
+export type User = {id:string;email:string;name:string;phone:string;active:number;roles:Array<typeof roles[number]>};
