@@ -12,6 +12,7 @@ import { attachUser } from './middleware/auth.js';
 import { createAuthRouter } from './auth/routes.js';
 import { createCoreRouter } from './routes/core.js';
 import { createOperationsRouter } from './routes/operations.js';
+import { createStudentRouter } from './routes/student.js';
 import { apiError,errorHandler } from './utils.js';
 
 export function createApp() {
@@ -46,12 +47,12 @@ export function createApp() {
   const authLimiter=rateLimit({windowMs:15*60*1000,limit:40,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'LOGIN_THROTTLED',message:'Too many attempts. Please try again later.'}})});
   app.use(['/api/v1/auth/login','/api/v1/auth/reset/consume'],authLimiter);
   app.use('/api/v1/auth',createAuthRouter(generateToken));
-  app.use('/api/v1',createCoreRouter(),createOperationsRouter());
+  app.use('/api/v1',createCoreRouter(),createOperationsRouter(),createStudentRouter());
   app.use('/api',(_req,res)=>res.status(404).json({error:{code:'NOT_FOUND',message:'API route not found.'}}));
   const dist=path.resolve('apps/web/dist');
   if(fs.existsSync(path.join(dist,'index.html'))) {
     app.use(express.static(dist,{index:false}));
-    app.get(/^\/(admin|volunteer)(\/.*)?$/,(_req,res)=>res.sendFile(path.join(dist,'index.html')));
+    app.get(/^\/(admin|volunteer|student)(\/.*)?$/,(_req,res)=>res.sendFile(path.join(dist,'index.html')));
     app.get('/reset-password',(_req,res)=>res.sendFile(path.join(dist,'index.html')));
     app.get('/',(_req,res)=>res.redirect('/admin/login'));
   }

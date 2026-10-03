@@ -157,13 +157,13 @@ export function createOperationsRouter() {
   });
   const variantSchema = z.object({ size: z.enum(['S', 'M', 'L', 'XL']), stock: z.number().int().min(0).max(100000).default(0) }).strict();
   const price = z.number().int().min(0).max(100_000_000);
-  const productSchema = z.object({ name: z.string().trim().min(2).max(100), description: z.string().trim().max(1000).default(''), price_paise: price, member_price_paise: price, active: z.boolean().default(true), variants: z.array(variantSchema).min(1).max(4).optional() }).strict();
+  const productSchema = z.object({ name: z.string().trim().min(2).max(100), description: z.string().trim().max(1000).default(''), image_url: z.string().max(500).default(''), price_paise: price, member_price_paise: price, active: z.boolean().default(true), variants: z.array(variantSchema).min(1).max(4).optional() }).strict();
   router.post('/products', requireAuth, requireAdmin, (req, res) => {
     const data = validate(productSchema, req.body); const productId = id();
     if (!data.variants?.length || new Set(data.variants.map((v: any) => v.size)).size !== data.variants.length) throw apiError(422, 'VARIANTS_REQUIRED', 'Provide distinct sizes with opening stock.');
     if (data.member_price_paise > data.price_paise) throw apiError(422, 'INVALID_MEMBER_PRICE', 'Member price cannot exceed standard price.');
     getDb().transaction(() => {
-      getDb().prepare('INSERT INTO products(id,name,description,active,price_paise,member_price_paise,created_at) VALUES(?,?,?,?,?,?,?)').run(productId, data.name, data.description, data.active ? 1 : 0, data.price_paise, data.member_price_paise, now());
+      getDb().prepare('INSERT INTO products(id,name,description,image_url,active,price_paise,member_price_paise,created_at) VALUES(?,?,?,?,?,?,?,?)').run(productId, data.name, data.description, data.image_url || '', data.active ? 1 : 0, data.price_paise, data.member_price_paise, now());
       for (const variant of data.variants!) { const variantId = id(); getDb().prepare('INSERT INTO product_variants(id,product_id,size,stock) VALUES(?,?,?,?)').run(variantId, productId, variant.size, variant.stock); if (variant.stock > 0) getDb().prepare('INSERT INTO stock_movements(id,variant_id,quantity,reason,actor_id,created_at) VALUES(?,?,?,?,?,?)').run(id(), variantId, variant.stock, 'Opening stock', actor(req), now()); }
       audit(actor(req), 'product.create', 'product', productId, {});
     }).immediate();
@@ -175,7 +175,7 @@ export function createOperationsRouter() {
     if (!product) throw apiError(404, 'NOT_FOUND', 'Product not found.');
     const data = { ...product, ...change };
     if (data.member_price_paise > data.price_paise) throw apiError(422, 'INVALID_MEMBER_PRICE', 'Member price cannot exceed standard price.');
-    const result = getDb().prepare('UPDATE products SET name=?,description=?,price_paise=?,member_price_paise=?,active=? WHERE id=?').run(data.name, data.description, data.price_paise, data.member_price_paise, data.active ? 1 : 0, req.params.id);
+    const result = getDb().prepare('UPDATE products SET name=?,description=?,image_url=?,price_paise=?,member_price_paise=?,active=? WHERE id=?').run(data.name, data.description, data.image_url || '', data.price_paise, data.member_price_paise, data.active ? 1 : 0, req.params.id);
     if (!result.changes) throw apiError(404, 'NOT_FOUND', 'Product not found.'); audit(actor(req), 'product.update', 'product', req.params.id as string, {});
     res.json({ data: getDb().prepare('SELECT * FROM products WHERE id=?').get(req.params.id) });
   });

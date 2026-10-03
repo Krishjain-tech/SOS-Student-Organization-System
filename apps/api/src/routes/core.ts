@@ -30,12 +30,17 @@ function adminView(req:any):boolean {
 }
 function eventForRole(req:any,event:any):any {
   if(adminView(req)) return event;
-  const {budget_paise,member_price_paise,nonmember_price_paise,...view}=event;
+  const {budget_paise,...view}=event;
   return view;
+  //
+  //
+  //
+  //
 }
 function eventVisible(req:any,eventId:string):any {
   const event=existing('events',eventId);
   if(adminView(req)) return event;
+  if(req.user?.roles?.includes('student')&&event.status==='PUBLISHED') return event;
   if(!req.user.roles.includes('volunteer')) throw apiError(403,'FORBIDDEN','Access denied.');
   if(event.status==='PUBLISHED'||getDb().prepare('SELECT 1 FROM event_assignments WHERE event_id=? AND user_id=?').get(eventId,req.user.id)) return event;
   throw apiError(404,'NOT_FOUND','Event not found.');
@@ -116,20 +121,21 @@ export function createCoreRouter() {
   });
   router.get('/events', requireAuth,(req,res)=>{
     const db=getDb(),admin=adminView(req),userId=req.user!.id;
-    const events=(db.prepare(admin?'SELECT * FROM events ORDER BY start_at DESC':'SELECT e.* FROM events e WHERE e.status=\'PUBLISHED\' OR EXISTS(SELECT 1 FROM event_assignments a WHERE a.event_id=e.id AND a.user_id=?) ORDER BY start_at DESC').all(...(admin?[]:[userId])) as any[]).map(e=>{
+    const isStudent=req.user!.roles.includes('student');
+    const events=(db.prepare(admin?'SELECT * FROM events ORDER BY start_at DESC':(isStudent?'SELECT * FROM events WHERE status=\'PUBLISHED\' ORDER BY start_at ASC':'SELECT e.* FROM events e WHERE e.status=\'PUBLISHED\' OR EXISTS(SELECT 1 FROM event_assignments a WHERE a.event_id=e.id AND a.user_id=?) ORDER BY start_at DESC')).all(...(admin||isStudent?[]:[userId])) as any[]).map(e=>{
       const response=db.prepare('SELECT response FROM volunteer_availability WHERE event_id=? AND user_id=?').get(e.id,userId) as any;
       return {...eventForRole(req,e),assigned:!!db.prepare('SELECT 1 FROM event_assignments WHERE event_id=? AND user_id=?').get(e.id,userId),can_check_in:!!db.prepare('SELECT 1 FROM event_assignments WHERE event_id=? AND user_id=? AND can_check_in=1').get(e.id,userId),availability_response:response?.response||null,availability_requested:!!db.prepare('SELECT 1 FROM availability_requests WHERE event_id=?').get(e.id),tickets_sold:e.seats_sold,assigned_count:(db.prepare('SELECT COUNT(*) n FROM event_assignments WHERE event_id=?').get(e.id) as any).n};
     });res.json({data:events});
   });
   router.post('/events', requireAuth,requireAdmin,(req,res)=>{
     const d=validate(eventSchema,req.body);if(d.end_at<d.start_at) throw apiError(422,'INVALID_DATES','Event end must follow its start.');const eventId=id();
-    getDb().prepare('INSERT INTO events(id,title,type,description,start_at,end_at,location,capacity,member_price_paise,nonmember_price_paise,budget_paise,volunteer_requirement,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(eventId,d.title,d.type,d.description,d.start_at,d.end_at,d.location,d.capacity,d.member_price_paise,d.nonmember_price_paise,d.budget_paise,d.volunteer_requirement,d.status,now(),now());audit(req.user!.id,'EVENT_CREATED','event',eventId);res.status(201).json({data:existing('events',eventId)});
+    getDb().prepare('INSERT INTO events(id,title,type,description,image_url,start_at,end_at,location,capacity,member_price_paise,nonmember_price_paise,budget_paise,volunteer_requirement,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(eventId,d.title,d.type,d.description,d.image_url||'',d.start_at,d.end_at,d.location,d.capacity,d.member_price_paise,d.nonmember_price_paise,d.budget_paise,d.volunteer_requirement,d.status,now(),now());audit(req.user!.id,'EVENT_CREATED','event',eventId);res.status(201).json({data:existing('events',eventId)});
   });
   router.patch('/events/:id', requireAuth,requireAdmin,(req,res)=>{
     const d=validatePatch(eventSchema.partial(),req.body),row=existing('events',String(req.params.id)),next={...row,...d};
     if(next.end_at<next.start_at) throw apiError(422,'INVALID_DATES','Event end must follow its start.');if(next.capacity<row.seats_sold) throw apiError(409,'SOLD_CAPACITY','Capacity cannot be below already issued tickets.');
     if(row.status==='CANCELLED'&&next.status!=='CANCELLED') throw apiError(409,'CANCELLED_EVENT','Cancelled events cannot be republished.');
-    getDb().transaction(()=>{getDb().prepare('UPDATE events SET title=?,type=?,description=?,start_at=?,end_at=?,location=?,capacity=?,member_price_paise=?,nonmember_price_paise=?,budget_paise=?,volunteer_requirement=?,status=?,updated_at=? WHERE id=?').run(next.title,next.type,next.description,next.start_at,next.end_at,next.location,next.capacity,next.member_price_paise,next.nonmember_price_paise,next.budget_paise,next.volunteer_requirement,next.status,now(),row.id);let cancelled_tasks=0;if(next.status==='CANCELLED'){getDb().prepare('UPDATE tickets SET status=\'CANCELLED\',refund_status=CASE WHEN price_paise>0 AND refund_status=\'NONE\' THEN \'UNRESOLVED\' ELSE refund_status END WHERE event_id=?').run(row.id);cancelled_tasks=getDb().prepare('UPDATE tasks SET status=\'CANCELLED\',updated_at=? WHERE event_id=? AND status IN(\'ASSIGNED\',\'IN_PROGRESS\')').run(now(),row.id).changes;}audit(req.user!.id,'EVENT_UPDATED','event',row.id,{status:next.status,cancelled_tasks});}).immediate();res.json({data:existing('events',row.id)});
+    getDb().transaction(()=>{getDb().prepare('UPDATE events SET title=?,type=?,description=?,image_url=?,start_at=?,end_at=?,location=?,capacity=?,member_price_paise=?,nonmember_price_paise=?,budget_paise=?,volunteer_requirement=?,status=?,updated_at=? WHERE id=?').run(next.title,next.type,next.description,next.image_url||'',next.start_at,next.end_at,next.location,next.capacity,next.member_price_paise,next.nonmember_price_paise,next.budget_paise,next.volunteer_requirement,next.status,now(),row.id);let cancelled_tasks=0;if(next.status==='CANCELLED'){getDb().prepare('UPDATE tickets SET status=\'CANCELLED\',refund_status=CASE WHEN price_paise>0 AND refund_status=\'NONE\' THEN \'UNRESOLVED\' ELSE refund_status END WHERE event_id=?').run(row.id);cancelled_tasks=getDb().prepare('UPDATE tasks SET status=\'CANCELLED\',updated_at=? WHERE event_id=? AND status IN(\'ASSIGNED\',\'IN_PROGRESS\')').run(now(),row.id).changes;}audit(req.user!.id,'EVENT_UPDATED','event',row.id,{status:next.status,cancelled_tasks});}).immediate();res.json({data:existing('events',row.id)});
   });
   router.get('/events/:id', requireAuth,(req,res)=>{
     const event=eventVisible(req,String(req.params.id)),db=getDb(),admin=adminView(req),userId=req.user!.id;
