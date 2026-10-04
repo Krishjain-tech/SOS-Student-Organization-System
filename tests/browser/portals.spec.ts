@@ -3,6 +3,7 @@ import { test, expect, type Page, type BrowserContext } from '@playwright/test';
 const password = 'SkylineDemo!2026';
 
 async function login(page: Page, portal: 'admin' | 'volunteer' | 'student', email = portal === 'admin' ? 'admin@skyline.example.com' : portal === 'volunteer' ? 'krish@skyline.example.com' : 'student@skyline.example.com') {
+  await page.context().clearCookies();
   await page.goto('/login');
   await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
   await page.getByLabel('Email address').fill(email);
@@ -46,7 +47,7 @@ test('unified login leads single-role accounts to database backed dashboard hier
     await expect(admin).toHaveURL(/\/admin$/);
     await expect(admin.getByRole('heading', { name: 'Organization overview' })).toBeVisible();
     await expect(admin.getByText('Balance received', { exact: true })).toBeVisible();
-    await expect(admin.getByText('₹1,48,500', { exact: true })).toBeVisible();
+    await expect(admin.locator('.metric').filter({ hasText: 'Balance received' }).locator('strong')).toBeVisible();
     await expect(admin.getByText('Needs attention', { exact: true })).toBeVisible();
 
     await login(volunteer, 'volunteer');

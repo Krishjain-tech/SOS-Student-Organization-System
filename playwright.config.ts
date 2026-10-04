@@ -16,6 +16,6 @@ export default defineConfig({
   use: { baseURL: 'http://127.0.0.1:5191', channel: process.env.PLAYWRIGHT_CHANNEL || 'chrome', headless: true, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   webServer: [
     { command: 'node --import tsx tests/browser-server.ts', url: 'http://127.0.0.1:3107/api/v1/health', env, reuseExistingServer: false, timeout: 60000, stdout: 'pipe', stderr: 'pipe' },
-    { command: 'npx vite --config apps/web/vite.config.ts --host 127.0.0.1 --port 5191', url: 'http://127.0.0.1:5191/admin/login', env, reuseExistingServer: false, timeout: 60000, stdout: 'pipe', stderr: 'pipe' },
+    { command: 'npx vite --config apps/web/vite.config.ts --host 127.0.0.1 --port 5191', url: 'http://127.0.0.1:5191/login', env, reuseExistingServer: false, timeout: 60000, stdout: 'pipe', stderr: 'pipe' },
   ],
 });

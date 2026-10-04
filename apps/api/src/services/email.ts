@@ -41,7 +41,7 @@ export interface SendVerificationEmailOptions {
 }
 
 export async function sendVerificationEmail({ to, name, token, origin }: SendVerificationEmailOptions): Promise<void> {
-  const appOrigin = origin || process.env.APP_ORIGIN || 'http://127.0.0.1:5173';
+  const appOrigin = (process.env.APP_ORIGIN || (origin && !origin.includes(':3001') ? origin : 'http://127.0.0.1:5173')).trim().replace(/\/+$/, '');
   const verificationLink = `${appOrigin}/student/verify-email?token=${token}`;
   const subject = 'Verify your Skyline Student account';
 

@@ -5,9 +5,6 @@ import os from 'node:os';
 import path from 'node:path';
 import type { Server } from 'node:http';
 import argon2 from 'argon2';
-import { createApp } from '../apps/api/src/app.js';
-import { getDb, closeDb } from '../apps/api/src/db/index.js';
-import { seedDemo, DEMO_PASSWORD, SEED_IDS } from '../scripts/seed.js';
 
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'skyline-unified-auth-'));
 process.env.TEST_DB_PATH = path.join(temp, 'test.sqlite');
@@ -15,6 +12,10 @@ process.env.UPLOAD_DIR = path.join(temp, 'receipts');
 process.env.SESSION_SECRET = 'a-secure-secret-for-unified-auth-testing-32-chars';
 process.env.NODE_ENV = 'test';
 process.env.DEMO_MODE = 'true';
+
+const { createApp } = await import('../apps/api/src/app.js');
+const { getDb, closeDb } = await import('../apps/api/src/db/index.js');
+const { seedDemo, DEMO_PASSWORD, SEED_IDS } = await import('../scripts/seed.js');
 
 let app: ReturnType<typeof createApp>;
 let server: Server;

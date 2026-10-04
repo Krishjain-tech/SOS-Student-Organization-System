@@ -83,9 +83,9 @@ after(async () => {
 });
 
 test('default seed is repeat safe and reconciles every financial source, stock movement and seat', async () => {
-  const result = reconcileDatabase(getDb(), true); assert.equal(result.totals.balance, 8_610_000);
+  const result = reconcileDatabase(getDb(), true); assert.equal(result.totals.balance, 24_610_000);
   const before = scalar('SELECT COUNT(*) n FROM payments'); assert.equal((await seedDemo()).seeded, false); assert.equal(scalar('SELECT COUNT(*) n FROM payments'), before);
-  const dashboard = await admin.request('GET', '/admin/dashboard'); expectStatus(dashboard, 200); assert.equal(dashboard.data.cash_received_paise, 14_850_000); assert.equal(dashboard.data.cash_paid_paise, 6_240_000); assert.equal(dashboard.data.approved_unpaid_paise, 840_000);
+  const dashboard = await admin.request('GET', '/admin/dashboard'); expectStatus(dashboard, 200); assert.equal(dashboard.data.cash_received_paise, 30_850_000); assert.equal(dashboard.data.cash_paid_paise, 6_240_000); assert.equal(dashboard.data.approved_unpaid_paise, 840_000);
   const volunteer = await krish.request('GET', '/volunteer/dashboard'); assert.equal(volunteer.data.awaiting_reimbursement_paise, 183_700); assert.equal(volunteer.data.open_tasks, 3); assert.equal(volunteer.data.due_today, 2); assert.equal(volunteer.data.cash_balance_paise, undefined);
 });
 

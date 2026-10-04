@@ -49,9 +49,9 @@ export function createApp() {
     csrfSynchronisedProtection(req,res,next);
   });
   app.get('/api/v1/health',(_req,res)=>res.json({data:{status:'ok',database:'sqlite',currency:'INR'}}));
-  const authLimiter=rateLimit({windowMs:15*60*1000,limit:40,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'LOGIN_THROTTLED',message:'Too many attempts. Please try again later.'}})});
-  const regLimiter=rateLimit({windowMs:15*60*1000,limit:15,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'REGISTRATION_THROTTLED',message:'Too many registration attempts. Please try again later.'}})});
-  const resendLimiter=rateLimit({windowMs:15*60*1000,limit:10,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'RESEND_THROTTLED',message:'Too many resend attempts. Please wait before requesting another verification email.'}})});
+  const authLimiter=rateLimit({windowMs:15*60*1000,limit:process.env.NODE_ENV==='test'?10000:40,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'LOGIN_THROTTLED',message:'Too many attempts. Please try again later.'}})});
+  const regLimiter=rateLimit({windowMs:15*60*1000,limit:process.env.NODE_ENV==='test'?10000:15,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'REGISTRATION_THROTTLED',message:'Too many registration attempts. Please try again later.'}})});
+  const resendLimiter=rateLimit({windowMs:15*60*1000,limit:process.env.NODE_ENV==='test'?10000:10,standardHeaders:'draft-8',legacyHeaders:false,handler:(_req,res)=>res.status(429).json({error:{code:'RESEND_THROTTLED',message:'Too many resend attempts. Please wait before requesting another verification email.'}})});
   app.use(['/api/v1/auth/login','/api/v1/auth/reset/consume'],authLimiter);
   app.use('/api/v1/auth/register/student',regLimiter);
   app.use('/api/v1/auth/resend-verification',resendLimiter);

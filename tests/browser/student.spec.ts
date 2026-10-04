@@ -3,6 +3,7 @@ import { test, expect, type Page } from '@playwright/test';
 const password = 'SkylineDemo!2026';
 
 async function loginStudent(page: Page, email = 'student@skyline.example.com', pass = password) {
+  await page.context().clearCookies();
   await page.goto('/login');
   await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
   await page.getByLabel('Email address').fill(email);

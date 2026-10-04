@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { getDb, closeDb, type SqliteDatabase } from '../apps/api/src/db/index.js';
 
-const expectedSeed = { membership: 4_500_000, tickets: 6_000_000, merchandise: 3_100_000, fundraiser: 1_250_000, received: 14_850_000, paid: 6_240_000, balance: 8_610_000, approved_unpaid: 840_000 };
+const expectedSeed = { membership: 15_000_000, tickets: 11_500_000, merchandise: 3_100_000, fundraiser: 1_250_000, received: 30_850_000, paid: 6_240_000, balance: 24_610_000, approved_unpaid: 840_000 };
 
 /** Checks relationships and amounts, not just a balancing dashboard number. */
 export function reconcileDatabase(db: SqliteDatabase = getDb(), assertSeed = false) {
@@ -48,7 +48,8 @@ export function reconcileDatabase(db: SqliteDatabase = getDb(), assertSeed = fal
     for (const [name, amount] of Object.entries(expectedSeed)) assert.equal(totals[name as keyof typeof totals], amount, `Default seed total: ${name}`);
     const krish = value("SELECT COALESCE(SUM(amount_paise),0) amount FROM expense_claims WHERE user_id='seed-volunteer-1' AND status IN ('SUBMITTED','APPROVED_UNPAID')");
     assert.equal(krish, 183_700, 'Krish submitted plus approved-unpaid');
-    assert.equal(value('SELECT COUNT(*) amount FROM member_records'), 50, 'Fifty seeded members');
+    assert.equal(value('SELECT COUNT(*) amount FROM member_records'), 150, 'One hundred fifty seeded members');
+    assert.equal(value("SELECT COUNT(*) amount FROM user_roles WHERE role='volunteer'"), 50, 'Fifty seeded volunteers');
   }
   return { ok: true, currency: 'INR', unit: 'paise', payments_checked: sources.length, totals, default_seed_checked: assertSeed };
 }

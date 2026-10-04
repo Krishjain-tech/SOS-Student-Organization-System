@@ -6,7 +6,6 @@ import {
   Ticket,
   Shirt,
   Bell,
-  Search,
   ShoppingCart,
   Crown,
   ChevronLeft,
@@ -171,7 +170,6 @@ export function StudentPortal() {
 
   // State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [eventCategoryFilter, setEventCategoryFilter] = useState('all');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -421,9 +419,8 @@ export function StudentPortal() {
 
   // Filter events
   const filteredEvents = (portalData?.events || []).filter(e => {
-    const matchesSearch = !searchQuery || e.title.toLowerCase().includes(searchQuery.toLowerCase()) || e.location.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = eventCategoryFilter === 'all' || e.type.toLowerCase() === eventCategoryFilter.toLowerCase();
-    return matchesSearch && matchesCat;
+    return matchesCat;
   });
 
   const cartTotalPaise = cart.reduce((sum, item) => sum + item.unit_price_paise * item.quantity, 0);
@@ -445,14 +442,11 @@ export function StudentPortal() {
       {/* ======================================================== */}
       {/* 1. MAIN HEADER                                            */}
       {/* ======================================================== */}
-      {/* ======================================================== */}
-      {/* 1. MAIN HEADER                                            */}
-      {/* ======================================================== */}
-      <header className="sticky top-0 z-50 bg-white border-b border-[#DCE6F2] shadow-sm">
-        <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between gap-6">
+      <header className="sticky top-0 z-50 bg-white border-b border-[#DCE6F2] shadow-xs">
+        <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between gap-4 sm:gap-6">
           {/* Brand Logo */}
           <Link to="/student" className="flex items-center gap-3 shrink-0 cursor-pointer">
-            <img src="/logo.png" alt="Skyline" className="w-auto object-contain h-12 sm:h-14" />
+            <img src="/logo.png" alt="Skyline" className="w-auto object-contain h-9 sm:h-10" />
             <div className="leading-none hidden sm:block border-l border-[#DCE6F2] pl-3">
               <span className="block text-[11px] font-semibold text-slate-400 tracking-wider uppercase">
                 Student Association
@@ -461,10 +455,10 @@ export function StudentPortal() {
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-7 font-medium text-sm text-slate-600">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 font-medium text-sm text-slate-600 h-full">
             <a
               href="#dashboard-top"
-              className="relative py-5 text-[#1463D8] font-semibold after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#1463D8]"
+              className="relative h-full flex items-center text-[#1463D8] font-semibold after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#1463D8]"
             >
               Home
             </a>
@@ -473,7 +467,7 @@ export function StudentPortal() {
                 const el = document.getElementById('events-section');
                 el ? el.scrollIntoView({ behavior: 'smooth' }) : setAllEventsModalOpen(true);
               }}
-              className="py-5 hover:text-[#1463D8] transition-colors cursor-pointer"
+              className="h-full flex items-center hover:text-[#1463D8] transition-colors cursor-pointer"
             >
               Events
             </button>
@@ -482,7 +476,7 @@ export function StudentPortal() {
                 const el = document.getElementById('merchandise-section');
                 el ? el.scrollIntoView({ behavior: 'smooth' }) : setAllMerchModalOpen(true);
               }}
-              className="py-5 hover:text-[#1463D8] transition-colors cursor-pointer"
+              className="h-full flex items-center hover:text-[#1463D8] transition-colors cursor-pointer"
             >
               Merchandise
             </button>
@@ -491,31 +485,20 @@ export function StudentPortal() {
                 const el = document.getElementById('announcements-section');
                 el ? el.scrollIntoView({ behavior: 'smooth' }) : setAllAnnouncementsModalOpen(true);
               }}
-              className="py-5 hover:text-[#1463D8] transition-colors cursor-pointer"
+              className="h-full flex items-center hover:text-[#1463D8] transition-colors cursor-pointer"
             >
               Announcements
             </button>
             <a
               href="#about-section"
-              className="py-5 hover:text-[#1463D8] transition-colors cursor-pointer"
+              className="h-full flex items-center hover:text-[#1463D8] transition-colors cursor-pointer"
             >
               About
             </a>
           </nav>
 
-          {/* Search Field & Profile Controls */}
-          <div className="flex items-center gap-4 shrink-0">
-            {/* Search Input */}
-            <div className="relative hidden sm:block w-48 md:w-64 lg:w-72">
-              <input
-                type="text"
-                placeholder="Search events, merchandise..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-1.5 text-xs bg-slate-50 border border-[#DCE6F2] rounded-full focus:outline-none focus:ring-2 focus:ring-[#1463D8]/30 focus:border-[#1463D8] transition placeholder:text-slate-400 text-slate-700"
-              />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            </div>
+          {/* Cart & Profile Controls */}
+          <div className="flex items-center gap-3 shrink-0">
 
             {/* Cart Button */}
             <button
@@ -524,26 +507,28 @@ export function StudentPortal() {
                 setMyOrdersModalOpen(true);
               }}
               aria-label="Open cart"
-              className="relative p-2 text-slate-600 hover:text-[#1463D8] hover:bg-slate-50 rounded-full transition cursor-pointer"
+              className="relative h-9 w-9 flex items-center justify-center text-slate-600 hover:text-[#1463D8] hover:bg-slate-50 rounded-lg border border-[#DCE6F2] transition cursor-pointer"
             >
-              <ShoppingCart className="w-5 h-5 text-slate-700" />
-              <span className="absolute top-0 right-0 w-4 h-4 bg-[#1463D8] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                {totalCartCount}
-              </span>
+              <ShoppingCart className="w-4 h-4 text-slate-700" />
+              {totalCartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#1463D8] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                  {totalCartCount}
+                </span>
+              )}
             </button>
 
             {/* User Profile Pill & Dropdown */}
             <div className="relative">
               <div
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 pl-2 border-l border-[#DCE6F2] cursor-pointer group"
+                className="h-9 flex items-center gap-2 pl-2 border-l border-[#DCE6F2] cursor-pointer group"
               >
-                <div className="w-8 h-8 rounded-full bg-[#102A4C] text-white text-xs font-semibold flex items-center justify-center ring-2 ring-transparent group-hover:ring-[#1463D8] transition">
+                <div className="w-7 h-7 rounded-full bg-[#102A4C] text-white text-xs font-semibold flex items-center justify-center ring-2 ring-transparent group-hover:ring-[#1463D8]/40 transition">
                   {user?.name ? user.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('') : 'AP'}
                 </div>
                 <div className="hidden lg:block text-left leading-tight">
-                  <span className="text-xs font-semibold text-[#102A4C] block truncate max-w-[130px]">{user?.name || 'Aarav Patel'}</span>
-                  <span className="text-[10px] text-slate-400 font-medium block truncate max-w-[130px]">{isMember ? 'Active Member' : 'Standard Student'}</span>
+                  <span className="text-xs font-semibold text-[#102A4C] block truncate max-w-[120px]">{user?.name || 'Aarav Patel'}</span>
+                  <span className="text-[10px] text-slate-400 font-medium block truncate max-w-[120px]">{isMember ? 'Active Member' : 'Standard Student'}</span>
                 </div>
                 <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition" />
               </div>
@@ -597,15 +582,15 @@ export function StudentPortal() {
               )}
             </div>
 
-            {/* Direct Sign out button for test accessibility */}
+            {/* Direct Sign out button */}
             <button
               onClick={logout}
               title="Sign out"
               aria-label="Sign out"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 rounded-lg transition cursor-pointer"
+              className="h-9 flex items-center gap-1.5 px-3 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-[#DCE6F2] rounded-lg transition cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden 2xl:inline">Sign out</span>
+              <span className="hidden xl:inline">Sign out</span>
             </button>
           </div>
         </div>
@@ -615,77 +600,104 @@ export function StudentPortal() {
       {/* 2. PAGE CONTENT                                           */}
       {/* ======================================================== */}
       <main className="max-w-[1440px] mx-auto px-6 py-6 space-y-6">
-        {/* HERO BANNER */}
-        <section className="relative overflow-hidden rounded-2xl border border-[#DCE6F2] shadow-sm flex flex-col lg:flex-row items-stretch bg-gradient-to-r from-white via-[#F4F8FE] to-[#EEF5FE]">
-          {/* Hero Details Left Content (42-46%) */}
-          <div className="relative z-10 w-full lg:w-[45%] p-7 sm:p-9 lg:p-11 xl:p-12 flex flex-col justify-center shrink-0">
-            <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#1463D8] mb-2.5">
-              Skyline Student Association
-            </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#102A4C] tracking-tight leading-[1.12] mb-4">
-              Students. Events.<br />
-              <span className="text-[#1463D8]">Community.</span>
-            </h1>
-            <p className="text-xs sm:text-sm lg:text-[14px] text-slate-600 mb-6 leading-relaxed max-w-md">
-              Join a vibrant community, attend exciting events, grab exclusive merchandise, and be part of something bigger.
-            </p>
-            <div className="flex flex-wrap items-center gap-3.5">
-              <button
-                onClick={() => {
-                  const el = document.getElementById('events-section');
-                  el ? el.scrollIntoView({ behavior: 'smooth' }) : setAllEventsModalOpen(true);
-                }}
-                className="px-5 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm inline-flex items-center gap-2 transition cursor-pointer"
-              >
-                Explore Events <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => {
-                  setMembershipStep('plan');
-                  setMembershipModalOpen(true);
-                }}
-                className="px-5 py-2.5 bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8] text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition cursor-pointer"
-              >
-                View Membership
-              </button>
+        {/* HERO BANNER - Clean Application Dashboard Card */}
+        <section className="relative overflow-hidden rounded-2xl border border-[#DCE6F2] bg-white shadow-xs p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-col lg:flex-row items-center lg:items-stretch justify-between gap-8 lg:gap-12">
+            {/* Left Column (~62%) */}
+            <div className="w-full lg:w-[62%] flex flex-col justify-center text-left">
+              <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#1463D8] mb-2.5">
+                SKYLINE STUDENT ASSOCIATION
+              </span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#102A4C] tracking-tight leading-tight mb-3.5">
+                Students. Events.<br className="hidden sm:inline" />{' '}
+                <span className="text-[#1463D8]">Community.</span>
+              </h1>
+              <p className="text-sm sm:text-base text-slate-600 mb-6 leading-relaxed max-w-xl">
+                Join a vibrant community, attend exciting events, grab exclusive merchandise, and be part of something bigger.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('events-section');
+                    el ? el.scrollIntoView({ behavior: 'smooth' }) : setAllEventsModalOpen(true);
+                  }}
+                  className="px-5 py-2.5 bg-[#1463D8] hover:bg-[#1052B5] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-2xs inline-flex items-center gap-2 transition cursor-pointer"
+                >
+                  Explore Events <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => {
+                    setMembershipStep('plan');
+                    setMembershipModalOpen(true);
+                  }}
+                  className="px-5 py-2.5 bg-white hover:bg-slate-50 text-[#1463D8] border border-[#1463D8] text-xs sm:text-sm font-semibold rounded-lg transition cursor-pointer"
+                >
+                  View Membership
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Hero Right Visual Campus Imagery (54-58%) */}
-          <div className="relative w-full lg:w-[55%] min-h-[280px] sm:min-h-[320px] lg:min-h-[380px] overflow-hidden select-none flex items-center justify-end">
-            <img
-              alt="Skyline Student Association - Students. Events. Community. More Than Just a Campus"
-              className="w-full h-full object-cover object-left lg:object-center pointer-events-none"
-              src="/images/hero_right_banner.png"
-            />
-            {/* Interactive Quick Access Hotspots Panel in bottom right */}
-            <div className="absolute right-4 bottom-4 sm:right-6 sm:bottom-6 z-20 bg-[#102A4C]/85 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 border border-white/15 shadow-xl min-w-[145px] sm:min-w-[155px] space-y-1.5 text-white">
+            {/* Right Column (~38%) - Quick Actions Panel (Clean Dashboard Cards) */}
+            <div className="w-full lg:w-[38%] flex flex-col justify-center gap-3 border-t lg:border-t-0 lg:border-l border-[#DCE6F2] pt-6 lg:pt-0 lg:pl-8">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                Quick Access
+              </span>
+              
+              {/* Events Action Card */}
               <button
                 onClick={() => {
                   const el = document.getElementById('events-section');
                   el ? el.scrollIntoView({ behavior: 'smooth' }) : setAllEventsModalOpen(true);
                 }}
-                className="w-full flex items-center gap-2.5 text-xs sm:text-[13px] font-semibold hover:text-blue-300 transition text-left py-1 cursor-pointer"
+                className="group flex items-center justify-between p-3.5 rounded-xl border border-[#DCE6F2] bg-[#F8FAFC] hover:bg-white hover:border-[#1463D8]/40 hover:shadow-xs transition text-left cursor-pointer"
               >
-                <CalendarDays className="w-4 h-4 text-blue-300" />
-                <span>Events</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#1463D8]/10 text-[#1463D8] flex items-center justify-center shrink-0 group-hover:bg-[#1463D8] group-hover:text-white transition">
+                    <CalendarDays className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-bold text-[#102A4C] group-hover:text-[#1463D8] transition">Campus Events</h3>
+                    <p className="text-[11px] text-slate-500">Upcoming tech talks, galas & fests</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#1463D8] group-hover:translate-x-0.5 transition" />
               </button>
+
+              {/* Merchandise Action Card */}
               <button
                 onClick={() => {
                   const el = document.getElementById('merchandise-section');
                   el ? el.scrollIntoView({ behavior: 'smooth' }) : setAllMerchModalOpen(true);
                 }}
-                className="w-full flex items-center gap-2.5 text-xs sm:text-[13px] font-semibold hover:text-blue-300 transition text-left py-1 cursor-pointer"
+                className="group flex items-center justify-between p-3.5 rounded-xl border border-[#DCE6F2] bg-[#F8FAFC] hover:bg-white hover:border-[#1463D8]/40 hover:shadow-xs transition text-left cursor-pointer"
               >
-                <ShoppingBag className="w-4 h-4 text-blue-300" />
-                <span>Merchandise</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#1463D8]/10 text-[#1463D8] flex items-center justify-center shrink-0 group-hover:bg-[#1463D8] group-hover:text-white transition">
+                    <ShoppingBag className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-bold text-[#102A4C] group-hover:text-[#1463D8] transition">Merchandise</h3>
+                    <p className="text-[11px] text-slate-500">Official hoodies, caps & bottles</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#1463D8] group-hover:translate-x-0.5 transition" />
               </button>
+
+              {/* Community Action Card */}
               <a
                 href="#about-section"
-                className="w-full flex items-center gap-2.5 text-xs sm:text-[13px] font-semibold hover:text-blue-300 transition text-left py-1 cursor-pointer"
+                className="group flex items-center justify-between p-3.5 rounded-xl border border-[#DCE6F2] bg-[#F8FAFC] hover:bg-white hover:border-[#1463D8]/40 hover:shadow-xs transition text-left cursor-pointer"
               >
-                <Users className="w-4 h-4 text-blue-300" />
-                <span>Community</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#1463D8]/10 text-[#1463D8] flex items-center justify-center shrink-0 group-hover:bg-[#1463D8] group-hover:text-white transition">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-bold text-[#102A4C] group-hover:text-[#1463D8] transition">Student Community</h3>
+                    <p className="text-[11px] text-slate-500">Connect, collaborate & engage</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#1463D8] group-hover:translate-x-0.5 transition" />
               </a>
             </div>
           </div>

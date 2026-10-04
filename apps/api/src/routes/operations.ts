@@ -152,8 +152,11 @@ export function createOperationsRouter() {
     res.json({ data: { deleted: true } });
   });
 
-  router.get('/products', requireAuth, requireAdmin, (_req, res) => {
-    const db = getDb(); res.json({ data: (db.prepare('SELECT * FROM products ORDER BY name').all() as any[]).map(product => ({ ...product, variants: db.prepare('SELECT * FROM product_variants WHERE product_id=? ORDER BY size').all(product.id) })) });
+  router.get('/products', requireAuth, requireAdmin, (req, res) => {
+    const db = getDb();
+    const includeInactive = req.query.include_inactive === 'true' || req.query.include_inactive === '1';
+    const sql = includeInactive ? 'SELECT * FROM products ORDER BY name' : 'SELECT * FROM products WHERE active=1 ORDER BY name';
+    res.json({ data: (db.prepare(sql).all() as any[]).map(product => ({ ...product, variants: db.prepare('SELECT * FROM product_variants WHERE product_id=? ORDER BY size').all(product.id) })) });
   });
   const variantSchema = z.object({ size: z.enum(['S', 'M', 'L', 'XL']), stock: z.number().int().min(0).max(100000).default(0) }).strict();
   const price = z.number().int().min(0).max(100_000_000);
@@ -181,7 +184,9 @@ export function createOperationsRouter() {
   });
   router.get('/variants', requireAuth, requireAdmin, (req, res) => {
     const productId = req.query.product_id ? validate(key, req.query.product_id) : null;
-    res.json({ data: getDb().prepare('SELECT v.*,p.name product_name,p.active,p.price_paise,p.member_price_paise FROM product_variants v JOIN products p ON p.id=v.product_id WHERE (? IS NULL OR v.product_id=?) ORDER BY p.name,CASE v.size WHEN \'S\' THEN 1 WHEN \'M\' THEN 2 WHEN \'L\' THEN 3 ELSE 4 END').all(productId, productId) });
+    const includeInactive = req.query.include_inactive === 'true' || req.query.include_inactive === '1';
+    const sql = `SELECT v.*,p.name product_name,p.active,p.price_paise,p.member_price_paise FROM product_variants v JOIN products p ON p.id=v.product_id WHERE (? IS NULL OR v.product_id=?) ${includeInactive ? '' : 'AND p.active=1'} ORDER BY p.name,CASE v.size WHEN 'S' THEN 1 WHEN 'M' THEN 2 WHEN 'L' THEN 3 ELSE 4 END`;
+    res.json({ data: getDb().prepare(sql).all(productId, productId) });
   });
   router.post('/products/:id/variants', requireAuth, requireAdmin, (req, res) => {
     const data = validate(variantSchema, req.body);

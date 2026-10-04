@@ -15,11 +15,11 @@ export function issuePasswordResetData(actorId:string,userId:string,reqOrigin?:s
   const user=userById(userId);if(!user||!user.active) throw apiError(404,'NOT_FOUND','Active account not found.');
   const token=randomBytes(32).toString('base64url'),expires_at=new Date(Date.now()+60*60*1000).toISOString();
   getDb().transaction(()=>{getDb().prepare('UPDATE password_reset_tokens SET used_at=? WHERE user_id=? AND used_at IS NULL').run(now(),user.id);getDb().prepare('INSERT INTO password_reset_tokens VALUES(?,?,?,?,NULL,?,?)').run(id(),user.id,tokenHash(token),expires_at,actorId,now());audit(actorId,'RESET_ISSUED','user',user.id,{expires_at});})();
-  const origin=reqOrigin||process.env.APP_ORIGIN||'http://localhost:5173';
+  const origin=(process.env.APP_ORIGIN||(reqOrigin&&!reqOrigin.includes(':3001')?reqOrigin:'http://127.0.0.1:5173')).trim().replace(/\/+$/, '');
   return {setup_link:`${origin}/reset-password?token=${token}`,expires_at,delivery:'Manual delivery by administrator. No email sent.'};
 }
 export function issuePasswordReset(req:any,res:any) {
-  const reqOrigin=req.get('Origin')||(req.get('host')?`${req.protocol}://${req.get('host')}`:undefined);
+  const reqOrigin=process.env.APP_ORIGIN||(req.get('Origin')&&!req.get('Origin')?.includes(':3001')?req.get('Origin'):undefined);
   res.json({data:issuePasswordResetData(req.user.id,req.params.id,reqOrigin)});
 }
 export function createAuthRouter(generateToken:(req:any,overwrite?:boolean)=>string) {
@@ -66,7 +66,7 @@ export function createAuthRouter(generateToken:(req:any,overwrite?:boolean)=>str
       db.prepare('INSERT INTO email_verification_tokens(id,user_id,token_hash,expires_at,used_at,created_at) VALUES(?,?,?,?,NULL,?)').run(id(),userId,hashedToken,expiresAt,now());
       audit(userId,'STUDENT_REGISTERED','user',userId,{email:data.email,phone:data.phone});
     })();
-    const reqOrigin=req.get('Origin')||(req.get('host')?`${req.protocol}://${req.get('host')}`:undefined);
+    const reqOrigin=process.env.APP_ORIGIN||(req.get('Origin')&&!req.get('Origin')?.includes(':3001')?req.get('Origin'):undefined);
     await sendVerificationEmail({to:data.email,name:data.name,token,origin:reqOrigin});
     res.status(201).json({data:{registered:true,email:data.email,requires_verification:true}});
   }));
@@ -98,7 +98,7 @@ export function createAuthRouter(generateToken:(req:any,overwrite?:boolean)=>str
           db.prepare('INSERT INTO email_verification_tokens(id,user_id,token_hash,expires_at,used_at,created_at) VALUES(?,?,?,?,NULL,?)').run(id(),user.id,hashedToken,expiresAt,now());
           audit(user.id,'RESEND_VERIFICATION','user',user.id);
         })();
-        const reqOrigin=req.get('Origin')||(req.get('host')?`${req.protocol}://${req.get('host')}`:undefined);
+        const reqOrigin=process.env.APP_ORIGIN||(req.get('Origin')&&!req.get('Origin')?.includes(':3001')?req.get('Origin'):undefined);
         await sendVerificationEmail({to:user.email,name:user.name,token,origin:reqOrigin});
       }
     }
